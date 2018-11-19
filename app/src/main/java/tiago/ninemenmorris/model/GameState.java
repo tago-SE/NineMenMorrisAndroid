@@ -1,6 +1,9 @@
 package tiago.ninemenmorris.model;
 
 public enum GameState {
+
+    /* @https://en.wikipedia.org/wiki/Nine_men%27s_morris */
+
     Placing,
     /*  The game begins with an empty board. The players determine who plays first, then take turns
      *  placing their men one per play on empty points. If a player is able to place three of their
