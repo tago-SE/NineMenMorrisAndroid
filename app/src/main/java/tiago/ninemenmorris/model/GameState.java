@@ -12,6 +12,7 @@ public enum GameState {
      *  with the caveat that a piece in an opponent's mill can only be removed if no other pieces
      *  are available. After all men have been placed, phase two begins.
      */
+
     Moving,
     /*  Players continue to alternate moves, this time moving a man to an adjacent point. A piece
      *  may not "jump" another piece. Players continue to try to form mills and remove their
@@ -21,11 +22,13 @@ public enum GameState {
      *  opponent's man is sometimes called "pounding" the opponent. When one player has been
      *  reduced to three men, phase three begins.
      */
+
     Flyin,
     /*  When a player is reduced to three pieces, there is no longer a limitation on that player of
      *  moving to only adjacent points: The player's men may "fly" (or "hop",[4][5] or "jump"[6])
      *  from any point to any vacant point.
-     */,
+     */
+
     Paused;
     /* Neither play is able to interact with the game in this stage.
     */
