@@ -35,18 +35,20 @@
             tools:layout="@layout/fragment_player" />
     </LinearLayout>
 
-    <fragment
-        android:id="@+id/boardFrag"
-        android:name="tiago.ninemenmorris.ui.fragments.BoardFragment"
-        android:layout_width="fill_parent"
+    <ImageView
+        android:id="@+id/board"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/todo"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playerLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/playerLayout"
+        app:layout_constraintVertical_bias="0.627"
+        app:srcCompat="@drawable/nmboard" />
+
+
 
 </android.support.constraint.ConstraintLayout>

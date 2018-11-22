@@ -22,6 +22,7 @@ import android.widget.TableRow;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.ui.vm.MainViewModel;
 
+@Deprecated
 public class BoardFragment extends Fragment {
 
     private static final float circleScale = (float) 1/15;
@@ -64,36 +65,32 @@ public class BoardFragment extends Fragment {
         final int orientation = getResources().getConfiguration().orientation;
         Log.w(TAG, "onCreateView (" + orientation + ")");
         boardView = view.findViewById(R.id.boardView);
+
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             boardView.post(new Runnable() {
                 @Override
                 public void run() {
-                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
                     int w = boardView.getWidth();
                     int h = boardView.getHeight();
                     Log.w(TAG, "W: " + w);
                     Log.w(TAG, "H: " + h);
                     setupBoard(boardView, w);
-                    boardParam.height = w;
-                    boardParam.width = w;
-                    boardView.setLayoutParams(boardParam);
-                    boardView.postInvalidate();
                 }
             });
         } else {
             boardView.post(new Runnable() {
                 @Override
                 public void run() {
-                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
-                    int boardSize = boardView.getHeight();
-                    setupBoard(boardView, boardSize);
-                    boardParam.height = boardSize;
-                    boardParam.width = boardSize;
-                    boardView.setLayoutParams(boardParam);
-                    boardView.postInvalidate();
+                    int w = boardView.getWidth();
+                    int h = boardView.getHeight();
+                    Log.w(TAG, "W: " + w);
+                    Log.w(TAG, "H: " + h);
+                    setupBoard(boardView, h);
                 }
             });
         }
+
+
 
         /*
         // Find and paint the board

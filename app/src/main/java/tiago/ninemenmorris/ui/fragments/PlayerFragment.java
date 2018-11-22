@@ -27,7 +27,7 @@ public class PlayerFragment extends Fragment {
     private static final String TAG = "PlayerFrag";
 
     // size of checker relative to screen dimension
-    private static final double circleFactor = 1./8.;
+    private static final double checkerFactor = 1./8.;
 
     private ImageView checkerView;
     private TextView playerText;
@@ -53,7 +53,7 @@ public class PlayerFragment extends Fragment {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        final int circleSize = (int) ((size.x > size.y? size.y: size.x)*circleFactor);
+        final int circleSize = (int) ((size.x > size.y? size.y: size.x)*checkerFactor);
         checkerView = view.findViewById(R.id.checker);
         checkerView.post(new Runnable() {
             @Override
