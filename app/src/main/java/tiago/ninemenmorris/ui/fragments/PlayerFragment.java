@@ -40,13 +40,10 @@ public class PlayerFragment extends Fragment {
     private static final double checkerFactor = 1./8.;
 
     private MainViewModel mainViewModel;
-
     private CheckerView checkerView;
     private TextView playerText;
     private TextView pointsText;
     private TextView remainingText;
-
-
 
 
     public PlayerFragment() {
@@ -57,28 +54,15 @@ public class PlayerFragment extends Fragment {
     }
 
     public void injectPlayer(Player player) {
-        double x = checkerView.getX();
-        double y = checkerView.getY();
-        Log.w(TAG, "X: " + x);
-        Log.w(TAG, "Y: " + y);
-
-        /*CheckerView cv = new CheckerView(getContext(), (int) x, (int) y, 200, Position.UNPLACED);
-
-        cv.paintBlue();
-        cv.show();
-        linearLayout.addView(cv);
-        */
         if (mainViewModel == null)
             throw new IllegalStateException("ViewModel must be injected first.");
         if (player.color == Color.RED) {
             handlePlayerRedLiveData();
             checkerView.paintRed();
-            //checkerView.setBackgroundResource(R.drawable.glossyred);
         }
          else if (player.color == Color.BLUE) {
             handlePlayerBlueLiveData();
             checkerView.paintBlue();
-            //checkerView.setBackgroundResource(R.drawable.glossyblue);
          }
         else
             throw new IllegalStateException("No player color defined.");
@@ -95,59 +79,25 @@ public class PlayerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_player, container, false);
 
+        // Get window dimension
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point windowSize = new Point();
         display.getSize(windowSize);
         final int checkerSize = (int) ((windowSize.x > windowSize.y? windowSize.y: windowSize.x)*checkerFactor);
-        /*
-        checkerView = view.findViewById(R.id.checker);
-        checkerView.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.w(TAG, "resizing checker: " + checkerSize);
-                checkerView.getLayoutParams().height = checkerSize;
-                checkerView.getLayoutParams().width= checkerSize;
-            }
-        });
-        setupDrag(checkerView);
-        */
+
         LinearLayout linearLayout = view.findViewById(R.id.linearLayout);
         playerText = view.findViewById(R.id.playerName);
         pointsText = view.findViewById(R.id.points);
         remainingText = view.findViewById(R.id.remianing);
         FrameLayout frameLayout = view.findViewById(R.id.frameLayout);
-        checkerView = new CheckerView(getContext(), 0, 0, 180, Position.UNPLACED);
+
+        checkerView = new CheckerView(getContext(), 0, 0, checkerSize, Position.UNPLACED);
         checkerView.show();
         checkerView.draggable = true;
         frameLayout.addView(checkerView);
         setupDrag();    // Configure checker draggability
         return view;
     }
-
-      /* // fragment size ???
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        screenH = displaymetrics.heightPixels;
-        screenW = displaymetrics.widthPixels;
-        */
-        /*
-        boardView.post(new Runnable() {
-                @Override
-                public void run() {
-                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
-                    int w = boardView.getWidth();
-                    int h = boardView.getHeight();
-                    Log.w(TAG, "W: " + w);
-                    Log.w(TAG, "H: " + h);
-                    setupBoard(boardView, w);
-                    boardParam.height = w;
-                    boardParam.width = w;
-                    boardView.setLayoutParams(boardParam);
-                    boardView.postInvalidate();
-                }
-            });
-         */
-
 
     private void setupDrag() {
         checkerView.setOnTouchListener(new View.OnTouchListener() {
