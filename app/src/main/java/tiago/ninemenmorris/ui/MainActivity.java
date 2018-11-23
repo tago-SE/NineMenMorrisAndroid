@@ -1,6 +1,7 @@
 package tiago.ninemenmorris.ui;
 
 import android.annotation.SuppressLint;
+import  android.support.v4.app.Fragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ClipData;
 import android.content.res.Configuration;
@@ -33,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView boardView;
     private ConstraintLayout layout;
-    private PlayerFragment playerOneFrag;
-    private  PlayerFragment playerTwoFrag;
+    private PlayerFragment player0Frag;
+    private PlayerFragment player1Frag;
 
     private MainViewModel mainViewModel;
 
@@ -52,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         boardView = findViewById(R.id.board);
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        player0Frag = (PlayerFragment) getSupportFragmentManager().findFragmentById(R.id.player0frag);
+        player0Frag.injectViewModel(mainViewModel, 0);
+        player1Frag = (PlayerFragment) getSupportFragmentManager().findFragmentById(R.id.player1frag);
+        player1Frag.injectViewModel(mainViewModel, 1);
 
         Display display = getWindowManager().getDefaultDisplay();
         screenSize = new Point();
@@ -66,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
                     boardParam.height = boardView.getWidth();
                     boardParam.width = boardView.getWidth();
                     boardView.setLayoutParams(boardParam);
-                    boardView.postInvalidate();
                     setupBoardNodes();
+                    boardView.postInvalidate();
                 }
             });
 
@@ -79,11 +84,13 @@ public class MainActivity extends AppCompatActivity {
                     boardParam.width = boardView.getHeight();
                     boardParam.height = boardView.getHeight();
                     boardView.setLayoutParams(boardParam);
-                    boardView.postInvalidate();
                     setupBoardNodes();
+                    boardView.postInvalidate();
+
                 }
             });
         }
+
 
 
 
@@ -103,8 +110,14 @@ public class MainActivity extends AppCompatActivity {
 
         //boardFragment.injectMainViewModel(mainViewModel);
 
+        // Starts the game
+        new Runnable(){
+            @Override
+            public void run() {
+                mainViewModel.start();
+            }
+        }.run();
     }
-
 
     public void setupBoardNodes() {
         Log.w("BOARD", "X: " + boardView.getLeft());
@@ -114,17 +127,18 @@ public class MainActivity extends AppCompatActivity {
         boardSize = boardView.getWidth();
         checkerSize = (int) (boardSize*circleFactor);
 
-        // setup
-        double factor = 1.63;
+        // setup;
         int leftX = (int) boardView.getX() - checkerSize/2;
         int midX = leftX + boardView.getWidth()/2;
         int rightX = leftX + boardView.getWidth();
         int topY = (int) boardView.getY() - checkerSize/2;
         int midY =  topY + boardView.getWidth()/2;
         int botY = topY + boardView.getWidth();
-        int d1 = (int) (boardView.getX()*factor) - checkerSize/2 - leftX;
+        int d1 = (int) (boardView.getWidth()*0.17);
+
         // Top horizontal
         layout.addView(createChecker(leftX, topY, checkerSize));
+
         layout.addView(createChecker(midX, topY, checkerSize));
         layout.addView(createChecker(rightX, topY, checkerSize));
         // Bot horizontal
@@ -153,14 +167,15 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(createChecker(midX + 2*d1, topY + d1, checkerSize));
         layout.addView(createChecker(midX - 2*d1, botY - d1, checkerSize));
         layout.addView(createChecker(midX + 2*d1, botY - d1, checkerSize));
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private View createChecker(int x, int y, int size) {
         final CheckerView view = new CheckerView(this, x, y, size);
-        view.paintRed();
         view.hide();
         view.show();
+        view.paintBlue();
         view.draggable = true;
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override

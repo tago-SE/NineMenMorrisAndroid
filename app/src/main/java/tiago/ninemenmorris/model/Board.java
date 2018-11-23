@@ -1,34 +1,33 @@
 package tiago.ninemenmorris.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 
-    public final int width;
-    public final int height;
-    public final int topX;
-    public final int topY;
-    public final int checkerHitBox;
+    private List<Checker> unplacedBlues;
+    private List<Checker> unplacedReds;
 
-    public Board(int topX, int topY, int w, int h) {
-        this.width = w;
-        this.height = h;
-        this.topX = topX;
-        this.topY = topY;
-        checkerHitBox = w/8;
-        System.out.println(toString());
+    public Board() {
+        unplacedBlues = new ArrayList<>();
+        unplacedReds = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            unplacedReds.add(new Checker(Color.RED));
+            unplacedBlues.add(new Checker(Color.BLUE));
+        }
+    }
+
+    public int getNumUnplacedReds() {
+        return unplacedReds.size();
+    }
+
+    public int getNumUnplacedBlues() {
+        return unplacedBlues.size();
     }
 
     public boolean drop(int x, int y) {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "Board{" +
-                "width=" + width +
-                ", height=" + height +
-                ", topX=" + topX +
-                ", topY=" + topY +
-                ", checkerHitBox=" + checkerHitBox +
-                '}';
-    }
+
 }

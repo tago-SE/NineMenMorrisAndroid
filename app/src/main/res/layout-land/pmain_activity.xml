@@ -9,7 +9,7 @@
     tools:layout_editor_absoluteY="73dp">
 
     <fragment
-        android:id="@+id/player1frag"
+        android:id="@+id/player0frag"
         android:name="tiago.ninemenmorris.ui.fragments.PlayerFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         tools:layout="@layout/fragment_player" />
 
     <fragment
-        android:id="@+id/player2frag"
+        android:id="@+id/player1frag"
         android:name="tiago.ninemenmorris.ui.fragments.PlayerFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
