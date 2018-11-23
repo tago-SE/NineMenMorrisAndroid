@@ -2,6 +2,11 @@ package tiago.ninemenmorris;
 
 import org.junit.Test;
 
+import java.util.List;
+
+import tiago.ninemenmorris.model.Board;
+import tiago.ninemenmorris.model.Position;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +17,11 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+        Board board = new Board();
+
+        List<Position> adj = board.getAdjacent(Position.A1, "V");
+        for (Position p : adj) {
+            System.out.println(p.toString());
+        }
     }
 }
