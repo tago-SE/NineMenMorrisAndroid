@@ -18,10 +18,6 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         Board board = new Board();
-
-        List<Position> adj = board.getAdjacent(Position.A1, "V");
-        for (Position p : adj) {
-            System.out.println(p.toString());
-        }
+        List<Position> adj = board.getAdjacent(Position.A1, "H");
     }
 }

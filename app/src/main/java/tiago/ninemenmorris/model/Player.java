@@ -3,11 +3,13 @@ package tiago.ninemenmorris.model;
 public class Player {
 
     public final String playerName;
+    public final Color color;
     public int wins;
     public boolean activeTurn;
 
-    public Player(String playerName) {
+    public Player(String playerName, Color color) {
         this.playerName = playerName;
+        this.color = color;
         wins = 0; // default
         activeTurn = false;
     }

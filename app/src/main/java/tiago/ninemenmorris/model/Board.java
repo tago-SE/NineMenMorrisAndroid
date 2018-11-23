@@ -1,42 +1,40 @@
 package tiago.ninemenmorris.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
 public class Board {
 
+    private static final String TAG = "Board";
+
     private List<Checker> unplacedBlues;
     private List<Checker> unplacedReds;
 
+    private Hashtable<Position, Checker> placedCheckers;
+
     private static Hashtable<String, List<Position>> adjacencyMap = null;
-    private static final String HORIZONTAL = "H";
-    private static final String VERTICAL = "V";
+    public static final String HORIZONTAL = "H";
+    public static final String VERTICAL = "V";
 
-    public void map(Position srcsPosition, String angle, Position p1, Position p2) {
-        List<Position> list = new ArrayList<>();
-        list.add(p1);
-        list.add(p2);
-        adjacencyMap.put(srcsPosition + angle, list);
-    }
 
-    public List<Position> getAdjacent(Position srcsPosition, String angle) {
-        return adjacencyMap.get(srcsPosition + angle);
-    }
 
     public Board() {
+        placedCheckers = new Hashtable<>();
         unplacedBlues = new ArrayList<>();
         unplacedReds = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             unplacedReds.add(new Checker(Color.RED));
             unplacedBlues.add(new Checker(Color.BLUE));
         }
-
         if (adjacencyMap == null) {
             adjacencyMap = new Hashtable<>();
 
-            //Horisonatl mappings
+            // Horizontal mappings
             map(Position.A1, HORIZONTAL, Position.D1, Position.G1);
             map(Position.B2, HORIZONTAL, Position.D2, Position.F2);
             map(Position.C3, HORIZONTAL, Position.D3, Position.E3);
@@ -46,7 +44,7 @@ public class Board {
             map(Position.B6, HORIZONTAL, Position.D6, Position.F6);
             map(Position.A7, HORIZONTAL, Position.D7, Position.G7);
 
-            //Vertical mappings
+            // Vertical mappings
             map(Position.A1, VERTICAL, Position.A4, Position.A7);
             map(Position.B2, VERTICAL, Position.B4, Position.B6);
             map(Position.C3, VERTICAL, Position.C4, Position.C5);
@@ -59,7 +57,42 @@ public class Board {
         }
     }
 
+    public boolean isOccupied(Position position) {
+        return placedCheckers.containsKey(position);
+    }
 
+    public Checker placeChecker(Position position, Color color) {
+        if (isOccupied(position))
+            return null;
+        Checker checker;
+        if (color == Color.RED && unplacedReds.size() > 0)
+            checker = unplacedReds.remove(0);
+        else if (color == Color.BLUE && unplacedBlues.size() > 0)
+            checker = unplacedBlues.remove(0);
+        else
+            return null;
+        placedCheckers.put(position, checker);
+        checker.position = position;
+        // Debug
+        Log.w(TAG, "placed checker {" + color.toString() + "@" + position.toString() + "}");
+        return checker;
+    }
+
+    public Collection<Checker> getPlacedCheckers() {
+        return placedCheckers.values();
+    }
+
+    public void unplaceAll() {
+        placedCheckers.clear();
+    }
+
+    public void removeChecker(Position position) {
+        placedCheckers.remove(position);
+    }
+
+    public List<Position> getAdjacent(Position srcsPosition, String angle) {
+        return adjacencyMap.get(srcsPosition + angle);
+    }
 
     public int getNumUnplacedReds() {
         return unplacedReds.size();
@@ -69,9 +102,21 @@ public class Board {
         return unplacedBlues.size();
     }
 
-    public boolean drop(int x, int y) {
-        return true;
-    }
+    private void map(Position p1, String angle, Position p2, Position p3) {
+        List<Position> l1 = new ArrayList<>();
+        l1.add(p2);
+        l1.add(p3);
+        adjacencyMap.put(p1 + angle, l1);
 
+        List<Position> l2 = new ArrayList<>();
+        l2.add(p1);
+        l2.add(p3);
+        adjacencyMap.put(p2 + angle, l2);
+
+        List<Position> l3 = new ArrayList<>();
+        l3.add(p1);
+        l3.add(p2);
+        adjacencyMap.put(p3 + angle, l3);
+    }
 
 }

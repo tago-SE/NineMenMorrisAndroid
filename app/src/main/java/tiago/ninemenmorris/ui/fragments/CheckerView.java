@@ -19,8 +19,6 @@ public class CheckerView extends ImageView {
 
     public final Position position;
 
-
-
     public CheckerView(Context context, int x, int y, int size, Position position) {
         super(context);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -34,7 +32,7 @@ public class CheckerView extends ImageView {
 
     public void paintRed() {
         setBackgroundResource(R.drawable.glossyred);
-    }
+}
 
     public void paintBlue() {
         setBackgroundResource(R.drawable.glossyblue);
@@ -56,5 +54,11 @@ public class CheckerView extends ImageView {
         return getVisibility() == INVISIBLE;
     }
 
-
+    @Override
+    public String toString() {
+        return "CheckerView{" +
+                "draggable=" + draggable +
+                ", position=" + position +
+                '}';
+    }
 }

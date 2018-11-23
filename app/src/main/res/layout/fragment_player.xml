@@ -36,17 +36,15 @@
             android:text="@string/player"
             android:textAlignment="center" />
 
-        <ImageView
-            android:id="@+id/checker"
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_gravity="center_vertical|center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:contentDescription="@string/todo"
-            android:src="@drawable/glossyred" />
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/remianing"

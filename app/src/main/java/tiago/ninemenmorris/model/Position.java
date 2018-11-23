@@ -11,6 +11,7 @@ public enum Position {
     D1, D2, D3, D5, D6, D7,
     E3, E4,E5,
     F2, F4, F6,
-    G1, G4, G7;
+    G1, G4, G7,
+    UNPLACED;
 
 }

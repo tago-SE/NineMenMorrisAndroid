@@ -1,6 +1,7 @@
 package tiago.ninemenmorris.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Game {
@@ -18,10 +19,9 @@ public class Game {
     }
 
     private Game() {
-        player1 = new Player("Player 1");
-        player2 = new Player("Player 2");
+        player1 = new Player("Player 1", Color.RED);
+        player2 = new Player("Player 2", Color.BLUE);
         gameState = GameState.PAUSED;
-        board = new Board();
     }
 
     public void start() {
@@ -35,9 +35,10 @@ public class Game {
             player2.activeTurn = true;
         }
         gameState = GameState.PLACING;
+        board = new Board();
     }
 
-    public int getUnplacedCheckers(Player p) {
+    public int getNumberOfUnplacedCheckers(Player p) {
         if (p.equals(player1)) {
             return board.getNumUnplacedReds();
         } else if (p.equals(player2)) {
@@ -47,12 +48,27 @@ public class Game {
         }
     }
 
-    public void placeChecker(Player p, int i) {
+    public Checker placeChecker(Position position) {
+        Checker placedChecker = board.placeChecker(position, curPlayer.color);
+        if (placedChecker != null) {
+            swapCurrentPlayer();
+        }
+        return placedChecker;
+    }
 
+    public Collection<Checker> getPlacedCheckers() {
+        return board.getPlacedCheckers();
     }
 
     public Player getCurrentPlayer() {
         return curPlayer;
+    }
+
+    private void swapCurrentPlayer() {
+        if (curPlayer.equals(player1))
+            curPlayer = player2;
+        else
+            curPlayer = player1;
     }
 
 }

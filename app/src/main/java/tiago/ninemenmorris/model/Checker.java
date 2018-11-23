@@ -5,17 +5,33 @@ import java.util.List;
 
 public class Checker {
 
-    public final Color color;
-    public boolean draggable;
-
-    public Position position;
-
+    protected final Color color;
+    protected boolean draggable;
+    protected Position position;
 
     public Checker(Color color) {
         this.color = color;
         draggable = false;
     }
 
+    public Color getColor() {
+        return color;
+    }
 
+    public boolean isDraggable() {
+        return draggable;
+    }
 
+    public Position getPosition() {
+        return position;
+    }
+
+    @Override
+    public String toString() {
+        return "Checker{" +
+                "color=" + color +
+                ", draggable=" + draggable +
+                ", position=" + position +
+                '}';
+    }
 }
