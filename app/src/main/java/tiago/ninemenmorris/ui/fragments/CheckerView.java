@@ -6,16 +6,22 @@ import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import tiago.ninemenmorris.R;
+import tiago.ninemenmorris.model.Position;
 
 @SuppressLint("AppCompatCustomView")
 public class CheckerView extends ImageView {
 
     public boolean draggable = false;
 
-    public CheckerView(Context context, int x, int y, int size) {
+    public final Position position;
+
+
+
+    public CheckerView(Context context, int x, int y, int size, Position position) {
         super(context);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(params);
@@ -23,6 +29,7 @@ public class CheckerView extends ImageView {
         getLayoutParams().width = size;
         setX(x);
         setY(y);
+        this.position = position;
     }
 
     public void paintRed() {
@@ -48,5 +55,6 @@ public class CheckerView extends ImageView {
     public boolean isHidden() {
         return getVisibility() == INVISIBLE;
     }
+
 
 }

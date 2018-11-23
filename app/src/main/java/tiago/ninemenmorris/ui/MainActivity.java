@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import tiago.ninemenmorris.R;
+import tiago.ninemenmorris.model.Position;
 import tiago.ninemenmorris.ui.fragments.BoardFragment;
 import tiago.ninemenmorris.ui.fragments.CheckerView;
 import tiago.ninemenmorris.ui.fragments.PlayerFragment;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
         }
 
 
@@ -137,46 +139,45 @@ public class MainActivity extends AppCompatActivity {
         int d1 = (int) (boardView.getWidth()*0.17);
 
         // Top horizontal
-        layout.addView(createChecker(leftX, topY, checkerSize));
-
-        layout.addView(createChecker(midX, topY, checkerSize));
-        layout.addView(createChecker(rightX, topY, checkerSize));
+        layout.addView(createChecker(leftX, topY, checkerSize, Position.A7));
+        layout.addView(createChecker(midX, topY, checkerSize, Position.D7));
+        layout.addView(createChecker(rightX, topY, checkerSize, Position.G7));
         // Bot horizontal
-        layout.addView(createChecker(leftX, botY, checkerSize));
-        layout.addView(createChecker(midX, botY, checkerSize));
-        layout.addView(createChecker(rightX, botY, checkerSize));
+        layout.addView(createChecker(leftX, botY, checkerSize, Position.A1));
+        layout.addView(createChecker(midX, botY, checkerSize, Position.D1));
+        layout.addView(createChecker(rightX, botY, checkerSize, Position.G1));
         // Left mid vertical
-        layout.addView(createChecker(leftX, midY, checkerSize));
-        layout.addView(createChecker(leftX + d1, midY, checkerSize));
-        layout.addView(createChecker(leftX + 2*d1, midY, checkerSize));
-        layout.addView(createChecker(rightX, midY, checkerSize));
-        layout.addView(createChecker(rightX - d1, midY, checkerSize));
-        layout.addView(createChecker(rightX - 2*d1, midY, checkerSize));
+        layout.addView(createChecker(leftX, midY, checkerSize, Position.A4));
+        layout.addView(createChecker(leftX + d1, midY, checkerSize, Position.B4));
+        layout.addView(createChecker(leftX + 2*d1, midY, checkerSize, Position.C4));
+        layout.addView(createChecker(rightX, midY, checkerSize, Position.G4));
+        layout.addView(createChecker(rightX - d1, midY, checkerSize, Position.F4));
+        layout.addView(createChecker(rightX - 2*d1, midY, checkerSize, Position.E4));
         // Mid horizontal
-        layout.addView(createChecker(midX, topY + d1, checkerSize));
-        layout.addView(createChecker(midX, topY + 2*d1, checkerSize));
-        layout.addView(createChecker(midX, botY - d1, checkerSize));
-        layout.addView(createChecker(midX, botY - 2*d1, checkerSize));
+        layout.addView(createChecker(midX, topY + d1, checkerSize, Position.D6));
+        layout.addView(createChecker(midX, topY + 2*d1, checkerSize, Position.D5));
+        layout.addView(createChecker(midX, botY - d1, checkerSize, Position.D2));
+        layout.addView(createChecker(midX, botY - 2*d1, checkerSize, Position.D3));
         // Inner corners
-        layout.addView(createChecker(midX - d1, (botY - 2*d1), checkerSize));
-        layout.addView(createChecker(midX + d1, (botY - 2*d1), checkerSize));
-        layout.addView(createChecker(midX + d1, topY + 2*d1, checkerSize));
-        layout.addView(createChecker(midX - d1, topY + 2*d1, checkerSize));
+        layout.addView(createChecker(midX - d1, (botY - 2*d1), checkerSize, Position.C3));
+        layout.addView(createChecker(midX + d1, (botY - 2*d1), checkerSize, Position.E3));
+        layout.addView(createChecker(midX + d1, topY + 2*d1, checkerSize, Position.E5));
+        layout.addView(createChecker(midX - d1, topY + 2*d1, checkerSize, Position.C5));
         // Middle corner
-        layout.addView(createChecker(midX - 2*d1, topY + d1, checkerSize));
-        layout.addView(createChecker(midX + 2*d1, topY + d1, checkerSize));
-        layout.addView(createChecker(midX - 2*d1, botY - d1, checkerSize));
-        layout.addView(createChecker(midX + 2*d1, botY - d1, checkerSize));
+        layout.addView(createChecker(midX - 2*d1, topY + d1, checkerSize, Position.B6));
+        layout.addView(createChecker(midX + 2*d1, topY + d1, checkerSize, Position.F6));
+        layout.addView(createChecker(midX - 2*d1, botY - d1, checkerSize, Position.B2));
+        layout.addView(createChecker(midX + 2*d1, botY - d1, checkerSize, Position.F2));
+
 
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private View createChecker(int x, int y, int size) {
-        final CheckerView view = new CheckerView(this, x, y, size);
-        view.hide();
+    private View createChecker(int x, int y, int size, Position position) {
+        size = size*2;
+        final CheckerView view = new CheckerView(this, x, y, size, position);
         view.show();
-        view.paintBlue();
-        view.draggable = true;
+        view.draggable = false;
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -201,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
                     case DragEvent.ACTION_DRAG_ENTERED:
                         break;
                     case DragEvent.ACTION_DROP:
-                        Log.w(TAG, "Dropped inside button");
-                        //mainViewModel.drop((int) event.getX(), (int) event.getY());
+                        Log.w(TAG, "Dropped inside button: " + view.position);
+                        mainViewModel.place(view.position);
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
                         break;
@@ -211,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        view.setId(0);
         return view;
     }
 }

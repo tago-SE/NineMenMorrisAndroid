@@ -6,6 +6,7 @@ import android.util.Log;
 
 import tiago.ninemenmorris.model.Game;
 import tiago.ninemenmorris.model.Player;
+import tiago.ninemenmorris.model.Position;
 
 public class MainViewModel extends ViewModel {
 
@@ -39,7 +40,7 @@ public class MainViewModel extends ViewModel {
         currentPlayerLiveData.postValue(game.getCurrentPlayer());
     }
 
-    public void place(int i) {
-        Log.w(TAG, "Dropped: (" + i + ")");
+    public void place(Position position) {
+        Log.w(TAG, "Dropped: (" + position + ")");
     }
 }

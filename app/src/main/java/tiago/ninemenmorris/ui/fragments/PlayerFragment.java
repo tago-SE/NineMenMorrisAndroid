@@ -95,7 +95,6 @@ public class PlayerFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_player, container, false);
 
-        Log.w(TAG, "createPlayerFragment");
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point windowSize = new Point();
         display.getSize(windowSize);
@@ -109,13 +108,14 @@ public class PlayerFragment extends Fragment {
                 checkerView.getLayoutParams().width= checkerSize;
             }
         });
-
         setupDrag(checkerView);
         playerText = view.findViewById(R.id.playerName);
         pointsText = view.findViewById(R.id.points);
         remainingText = view.findViewById(R.id.remianing);
+        return view;
+    }
 
-        /* // fragment size ???
+      /* // fragment size ???
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenH = displaymetrics.heightPixels;
@@ -139,8 +139,6 @@ public class PlayerFragment extends Fragment {
             });
          */
 
-        return view;
-    }
 
     private void setupDrag(final View view) {
         view.setOnTouchListener(new View.OnTouchListener() {
