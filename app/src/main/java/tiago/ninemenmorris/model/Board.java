@@ -12,28 +12,22 @@ public class Board {
 
     private static final String TAG = "Board";
 
-    private List<Checker> unplacedBlues;
-    private List<Checker> unplacedReds;
-
-    private Hashtable<Position, Checker> placedCheckers;
-
+    private List<Checker> unplacedBlues = new ArrayList<>();
+    private List<Checker> unplacedReds = new ArrayList<>();
+    private Hashtable<Position, Checker> placedCheckers = new Hashtable<>();
     private static Hashtable<String, List<Position>> adjacencyMap = null;
-    public static final String HORIZONTAL = "H";
-    public static final String VERTICAL = "V";
+    private static final int NUM_CHECKERS = 1;
 
-
+    public static final String HORIZONTAL   = "H";
+    public static final String VERTICAL     = "V";
 
     public Board() {
-        placedCheckers = new Hashtable<>();
-        unplacedBlues = new ArrayList<>();
-        unplacedReds = new ArrayList<>();
-        for (int i = 0; i < 9; i++) {
-            unplacedReds.add(new Checker(Color.RED));
-            unplacedBlues.add(new Checker(Color.BLUE));
+        for (int i = 0; i < NUM_CHECKERS; i++) {
+            unplacedReds.add(new Checker(Color.RED, false));
+            unplacedBlues.add(new Checker(Color.BLUE, false));
         }
         if (adjacencyMap == null) {
             adjacencyMap = new Hashtable<>();
-
             // Horizontal mappings
             map(Position.A1, HORIZONTAL, Position.D1, Position.G1);
             map(Position.B2, HORIZONTAL, Position.D2, Position.F2);
@@ -43,7 +37,6 @@ public class Board {
             map(Position.C5, HORIZONTAL, Position.D5, Position.E5);
             map(Position.B6, HORIZONTAL, Position.D6, Position.F6);
             map(Position.A7, HORIZONTAL, Position.D7, Position.G7);
-
             // Vertical mappings
             map(Position.A1, VERTICAL, Position.A4, Position.A7);
             map(Position.B2, VERTICAL, Position.B4, Position.B6);
@@ -53,7 +46,6 @@ public class Board {
             map(Position.E3, VERTICAL, Position.E4, Position.E5);
             map(Position.F2, VERTICAL, Position.F4, Position.F6);
             map(Position.G1, VERTICAL, Position.G4, Position.G7);
-
         }
     }
 
@@ -78,16 +70,28 @@ public class Board {
         return checker;
     }
 
+    public Checker moveChecker(Position source, Position destination) {
+        Checker checker = placedCheckers.get(source);
+        if (checker == null)
+            return checker;
+        if (isOccupied(destination))
+            return null;
+        placedCheckers.remove(source);
+        placedCheckers.put(destination, checker);
+        checker.position = destination;
+        return checker;
+    }
+
     public Collection<Checker> getPlacedCheckers() {
         return placedCheckers.values();
     }
 
-    public void unplaceAll() {
-        placedCheckers.clear();
+    public void remove(Position position) {
+        placedCheckers.remove(position);
     }
 
-    public void removeChecker(Position position) {
-        placedCheckers.remove(position);
+    public Checker get(Position position) {
+        return placedCheckers.get(position);
     }
 
     public List<Position> getAdjacent(Position srcsPosition, String angle) {
@@ -118,5 +122,4 @@ public class Board {
         l3.add(p2);
         adjacencyMap.put(p3 + angle, l3);
     }
-
 }

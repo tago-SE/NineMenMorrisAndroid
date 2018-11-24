@@ -45,6 +45,7 @@ public class PlayerFragment extends Fragment {
     private TextView pointsText;
     private TextView remainingText;
 
+    private int lastRemaining = -1;
 
     public PlayerFragment() {
     }
@@ -64,8 +65,7 @@ public class PlayerFragment extends Fragment {
             handlePlayerBlueLiveData();
             checkerView.paintBlue();
          }
-        else
-            throw new IllegalStateException("No player color defined.");
+        else throw new IllegalStateException("No player color defined.");
     }
 
     @Override
@@ -85,7 +85,6 @@ public class PlayerFragment extends Fragment {
         display.getSize(windowSize);
         final int checkerSize = (int) ((windowSize.x > windowSize.y? windowSize.y: windowSize.x)*checkerFactor);
 
-        LinearLayout linearLayout = view.findViewById(R.id.linearLayout);
         playerText = view.findViewById(R.id.playerName);
         pointsText = view.findViewById(R.id.points);
         remainingText = view.findViewById(R.id.remianing);
@@ -93,12 +92,13 @@ public class PlayerFragment extends Fragment {
 
         checkerView = new CheckerView(getContext(), 0, 0, checkerSize, Position.UNPLACED);
         checkerView.show();
-        checkerView.draggable = true;
+        checkerView.draggable = false;
         frameLayout.addView(checkerView);
         setupDrag();    // Configure checker draggability
         return view;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setupDrag() {
         checkerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -119,13 +119,14 @@ public class PlayerFragment extends Fragment {
         mainViewModel.player0LiveData.observe(this, new Observer<Player>(){
             @Override
             public void onChanged(@Nullable Player player) {
-                update(player);
+                updatePlayer(player);
             }
         });
+        // Handle remaining checkers to place event
         mainViewModel.remainingRedLiveData.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer remaining) {
-                remainingText.setText("" + remaining);
+                updateRemaining(remaining);
             }
         });
     }
@@ -134,20 +135,33 @@ public class PlayerFragment extends Fragment {
         mainViewModel.player1LiveData.observe(this, new Observer<Player>(){
             @Override
             public void onChanged(@Nullable Player player) {
-                update(player);
+                updatePlayer(player);
             }
         });
+        // Handle remaining checkers to place event
         mainViewModel.remainingBlueLiveData.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer remaining) {
-                remainingText.setText("" + remaining);
+                updateRemaining(remaining);
             }
         });
     }
 
-    private void update(Player player) {
+    private void updateRemaining(int remaining) {
+        lastRemaining = remaining;
+        remainingText.setText("" + remaining);
+    }
+
+    private void updatePlayer(Player player) {
+        if (player == null)
+            return;
         if (player.activeTurn) {
             playerText.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            if (lastRemaining != 0)
+                checkerView.draggable = true;
+        } else {
+            playerText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+            checkerView.draggable = false;
         }
         playerText.setText(player.playerName);
         pointsText.setText("" + player.wins);

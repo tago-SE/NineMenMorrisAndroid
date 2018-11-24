@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
 import java.util.Collection;
+import java.util.List;
 
 import tiago.ninemenmorris.model.Checker;
 import tiago.ninemenmorris.model.Color;
@@ -27,7 +28,6 @@ public class MainViewModel extends ViewModel {
     public final MutableLiveData<Integer> remainingBlueLiveData = new MutableLiveData<>();
     // Checker Board changes
     public final MutableLiveData<Collection<Checker>> checkerLiveData = new MutableLiveData<>();
-
 
     private Game game;
 
@@ -64,8 +64,6 @@ public class MainViewModel extends ViewModel {
         /*
 
         */
-
-
         // Update current active player
         currentPlayerLiveData.postValue(game.getCurrentPlayer());
     }
@@ -78,19 +76,33 @@ public class MainViewModel extends ViewModel {
         return game.player2;
     }
 
-    public void placeChecker(Position position) {
+    public void dropChecker(Position source, Position destination) {
+        if (destination == null)
+            throw new NullPointerException("no destination provided");
         Player p = game.getCurrentPlayer();
-        Checker placedChecker = game.placeChecker(position);
-        if (placedChecker != null){
-
+        Checker returnedChecker = null;
+        // if source is null then it's a place checker event, otherwise it tries to move a checker
+        // at the given source to the provided destination.
+        Collection<Checker> collection = null;
+        if (source == null) {
+            Log.w(TAG, "place: " + destination);
+            collection = game.placeChecker(destination);
+        } else {
+            Log.w(TAG, "move: " + source + ":" +  destination);
+            collection = game.moveChecker(source, destination);
+        }
+        // If the returned checker is not null then the move was accepted and the data changes are
+        // published to the view
+        if (collection != null){
             if (p.color == Color.RED){
                 remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(p));
-                checkerLiveData.postValue(game.getPlacedCheckers());
             } else{
                 remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(p));
-                checkerLiveData.postValue(game.getPlacedCheckers());
             }
-
+            // Update that player data has changed
+            player0LiveData.postValue(game.player1);
+            player1LiveData.postValue(game.player2);
+            checkerLiveData.postValue(collection);
         }
     }
 }

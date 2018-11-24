@@ -18,6 +18,7 @@ public class Player {
     public String toString() {
         return "Player{" +
                 "playerName='" + playerName + '\'' +
+                ", color=" + color +
                 ", wins=" + wins +
                 ", activeTurn=" + activeTurn +
                 '}';

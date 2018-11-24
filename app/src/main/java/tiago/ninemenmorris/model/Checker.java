@@ -9,9 +9,9 @@ public class Checker {
     protected boolean draggable;
     protected Position position;
 
-    public Checker(Color color) {
+    public Checker(Color color, boolean draggable) {
         this.color = color;
-        draggable = false;
+        this.draggable = draggable;
     }
 
     public Color getColor() {

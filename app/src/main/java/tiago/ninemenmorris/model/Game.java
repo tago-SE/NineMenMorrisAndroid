@@ -25,8 +25,7 @@ public class Game {
     }
 
     public void start() {
-        int random = (int) (Math.random()*1);
-        if (random == 0) {
+        if ((int) (Math.random()*100) < 50) {
             curPlayer = player1;
             player1.activeTurn = true;
         }
@@ -48,12 +47,28 @@ public class Game {
         }
     }
 
-    public Checker placeChecker(Position position) {
+
+    public Collection<Checker> moveChecker(Position source, Position destination) {
+        Checker movedChecker = board.moveChecker(source, destination);
+        if (movedChecker != null) {
+            List<Checker> list = new ArrayList<>();
+            list.addAll(board.getPlacedCheckers());
+            Checker dummyChecker = new Checker(Color.TRANSPARENT, false);
+            dummyChecker.position = source;
+            list.add(dummyChecker);
+            return list;
+        }
+        return null;
+
+    }
+
+    public Collection<Checker> placeChecker(Position position) {
         Checker placedChecker = board.placeChecker(position, curPlayer.color);
         if (placedChecker != null) {
             swapCurrentPlayer();
+            return getPlacedCheckers();
         }
-        return placedChecker;
+        return null;
     }
 
     public Collection<Checker> getPlacedCheckers() {
@@ -64,11 +79,30 @@ public class Game {
         return curPlayer;
     }
 
+
+    @Deprecated
     private void swapCurrentPlayer() {
-        if (curPlayer.equals(player1))
+        // this needs to be fixed slightly
+        if (getNumberOfUnplacedCheckers(player1) == 0 || getNumberOfUnplacedCheckers(player2) == 0) {
+            Collection<Checker> checkers = board.getPlacedCheckers();
+
+            for (Checker checker : checkers) {
+                if (curPlayer.color == checker.color) {
+                    checker.draggable = false;
+                } else {
+                    checker.draggable = true;
+                }
+            }
+        }
+        if (curPlayer.equals(player1)) {
             curPlayer = player2;
-        else
+            player1.activeTurn = false;
+        }
+        else {
             curPlayer = player1;
+            player1.activeTurn = true;
+        }
+        player2.activeTurn = !player1.activeTurn;
     }
 
 }

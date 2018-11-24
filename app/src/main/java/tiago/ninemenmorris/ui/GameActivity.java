@@ -2,6 +2,7 @@ package tiago.ninemenmorris.ui;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
+import android.content.ClipDescription;
 import android.support.annotation.Nullable;
 import  android.support.v4.app.Fragment;
 import android.arch.lifecycle.ViewModelProviders;
@@ -21,8 +22,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Checker;
@@ -40,19 +44,14 @@ public class GameActivity extends AppCompatActivity {
 
     // size of checker relative to screen dimension
     private static final double circleFactor = 1./8.;
-
     private Hashtable<Position, View> nodeMap = new Hashtable<>();
+    private List<CheckerView> checkerViewList = new ArrayList<>();
 
     private ImageView boardView;
     private ConstraintLayout layout;
     private PlayerFragment player0Frag;
     private PlayerFragment player1Frag;
-
     private MainViewModel mainViewModel;
-
-    private Point screenSize;
-    private int boardSize;
-    private int checkerSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +75,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Get screen dimensions
         Display display = getWindowManager().getDefaultDisplay();
-        screenSize = new Point();
+        Point screenSize = new Point();
         display.getSize(screenSize);
 
         Log.w(TAG, "(" + screenSize.x + "," + screenSize.y + ")");
@@ -111,13 +110,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setupBoardNodes() {
-        Log.w("BOARD", "X: " + boardView.getLeft());
-        Log.w("BOARD", "Y: " + boardView.getTop());
-        Log.w("BOARD", "W: " + boardView.getWidth());
-        Log.w("BOARD", "H: " + boardView.getHeight());
-        boardSize = boardView.getWidth();
-        checkerSize = (int) (boardSize*circleFactor);
-
+        int checkerSize = (int) (boardView.getWidth()*circleFactor);
         // setup;
         int leftX = (int) boardView.getX() - checkerSize/2;
         int midX = leftX + boardView.getWidth()/2;
@@ -157,7 +150,6 @@ public class GameActivity extends AppCompatActivity {
         layout.addView(createChecker(midX + 2*d1, topY + d1, checkerSize, Position.F6));
         layout.addView(createChecker(midX - 2*d1, botY - d1, checkerSize, Position.B2));
         layout.addView(createChecker(midX + 2*d1, botY - d1, checkerSize, Position.F2));
-
         // Checker update handler
         handleObservedCheckers();
     }
@@ -170,13 +162,17 @@ public class GameActivity extends AppCompatActivity {
                     return;
                 for (Checker checker : checkers) {
                     CheckerView view = (CheckerView) nodeMap.get(checker.getPosition());
-                    if (view == null)
-                        Log.e(TAG, "CheckerView is null!");
-                    if (checker.getColor() == Color.RED)
+                    if (checker.getColor() == Color.RED) {
                         view.paintRed();
-                    else
+                        view.show();
+                    }
+                    else if (checker.getColor() == Color.BLUE) {
                         view.paintBlue();
-                    view.show();
+                        view.show();
+                    } else {
+                        view.hide();
+                    }
+                    view.draggable = checker.isDraggable();
                 }
             }
         });
@@ -188,8 +184,6 @@ public class GameActivity extends AppCompatActivity {
         mainViewModel.refresh();
     }
 
-
-
     @SuppressLint("ClickableViewAccessibility")
     private View createChecker(int x, int y, int size, Position position) {
         final CheckerView view = new CheckerView(this, x, y, size, position);
@@ -197,14 +191,17 @@ public class GameActivity extends AppCompatActivity {
         view.draggable = false;
         // Maps the view to the given position
         nodeMap.put(position, view);
-
+        checkerViewList.add(view);
         Log.d(TAG, "created: " + view.toString());
 
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (view.draggable && event.getAction() == MotionEvent.ACTION_DOWN) {
-                    ClipData data = ClipData.newPlainText("", "");
+                    // Save the position as clip data to be retrieved on drop
+                    ClipData.Item item = new ClipData.Item("" + view.position);
+                    ClipData data = new ClipData("", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    // Start drag
                     View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                     view.startDragAndDrop(data, shadowBuilder, view, 0);
                     return true;
@@ -224,7 +221,13 @@ public class GameActivity extends AppCompatActivity {
                     case DragEvent.ACTION_DRAG_ENTERED:
                         break;
                     case DragEvent.ACTION_DROP:
-                        mainViewModel.placeChecker(view.position);
+                        // get stored position inside clip data if any exists
+                        String data = (String) event.getClipData().getItemAt(0).getText();
+                        Position sourcePosition = null;
+                        if (!data.equals(""))
+                            sourcePosition = Position.valueOf(data);
+
+                        mainViewModel.dropChecker(sourcePosition, view.position);
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
                         break;
