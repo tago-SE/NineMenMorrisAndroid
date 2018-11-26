@@ -3,7 +3,9 @@ package tiago.ninemenmorris.ui;
 import android.arch.lifecycle.Observer;
 import android.content.ClipDescription;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ClipData;
@@ -16,7 +18,6 @@ import android.view.Display;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
+import tiago.ninemenmorris.DB.DBHandler;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Checker;
 import tiago.ninemenmorris.model.Color;
@@ -42,6 +44,7 @@ public class GameActivity extends AppCompatActivity {
 
     // size of checker relative to screen dimension
     private static final double circleFactor = 1./8.;
+    private static final int VICTORY_DELAY = 5000;
     private Hashtable<Position, View> nodeMap = new Hashtable<>();
     private List<CheckerView> checkerViewList = new ArrayList<>();
 
@@ -85,7 +88,7 @@ public class GameActivity extends AppCompatActivity {
         Log.e(TAG, "BX" + boardView.getX());
         Log.e(TAG, "BY" + boardView.getY());
 
-        Log.w(TAG, "(" + screenSize.x + "," + screenSize.y + ")");
+        Log.w(TAG, "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         layout.setOnDragListener(new View.OnDragListener() {
             @Override
@@ -147,12 +150,6 @@ public class GameActivity extends AppCompatActivity {
         mainViewModel.refresh();
     }
 
-    private void runOnStart() {
-        mapCoordinates();
-        handleObservedCheckers();
-        mainViewModel.start(); // Should be moved to the "start button"
-    }
-
     private void setupDrag(final CheckerView view) {
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -183,6 +180,16 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        (new Handler()).post(new Runnable() {
+            @Override
+            public void run() {
+                mapCoordinates();
+                handleObservedCheckers();
+                mainViewModel.refresh();
+            }
+        });
+
+        /*
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             boardView.post(new Runnable() {
                 @Override
@@ -215,6 +222,7 @@ public class GameActivity extends AppCompatActivity {
                 }
             });
         }
+        */
     }
 
     private void handleObservedWinner() {
@@ -222,7 +230,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable Player player) {
                 if (player == null) return;
-                Toast.makeText(context, player.playerName + " has won!", 6).show();
+                Toast.makeText(context, player.playerName + " has won!", 4).show();
             }
         });
     }
@@ -272,12 +280,6 @@ public class GameActivity extends AppCompatActivity {
     private void mapCoordinates() {
         if (pointMap != null)
             return;
-        Log.w(TAG, "Mapping coordinates...");
-
-        Log.e(TAG, "BW" + boardView.getWidth());
-        Log.e(TAG, "BX" + boardView.getX());
-        Log.e(TAG, "BY" + boardView.getY());
-
         // Setup
         checkerSize = (int) (boardView.getWidth()*circleFactor);
         int leftX = (int) boardView.getX() - checkerSize/2;
@@ -287,16 +289,13 @@ public class GameActivity extends AppCompatActivity {
         int midY =  topY + boardView.getWidth()/2;
         int botY = topY + boardView.getWidth();
         int d1 = (int) (boardView.getWidth()*0.17);
-        // Map coordinates
-        //pointMap = new Hashtable<>();
-        // Top horizontal
-        System.out.println("leftX " + leftX);
-        pointMap = new Hashtable<>();
-        Point p = new Point(leftX, topY);
-        System.out.println(p);
-        pointMap.put(Position.UNPLACED, p);
-        System.out.println(pointMap.get(Position.UNPLACED));
 
+        Log.w(TAG, "board width: " + boardView.getWidth());
+        Log.w(TAG, "board height: " + boardView.getHeight());
+
+        // Map coordinates
+        pointMap = new Hashtable<>();
+        // Top horizontal
         pointMap.put(Position.A7, new Point(leftX, topY));
         pointMap.put(Position.D7, new Point(midX, topY));
         pointMap.put(Position.G7, new Point(rightX, topY));

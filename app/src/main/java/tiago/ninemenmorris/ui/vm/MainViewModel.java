@@ -43,20 +43,12 @@ public class MainViewModel extends ViewModel {
     static boolean startOnceOnly = true;
 
     public void refresh() {
-        //checkerLiveData.postValue(game.getPlacedCheckers());
-        //remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
-        //remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
+        postPlayerData(game.player1);
+        postPlayerData(game.player2);
+        postBoardData(game.getCheckers());
     }
 
     public void start() {
-       if (!startOnceOnly)
-            return;
-        startOnceOnly = false;
-
-        Log.w(TAG, "start...");
-        // Update player info
-
-
         game.start();
         postBoardData(game.getCheckers());
         postPlayerData(game.player1);

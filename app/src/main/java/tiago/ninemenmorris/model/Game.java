@@ -7,7 +7,7 @@ import java.util.List;
 public class Game {
 
     private static final Game ourInstance = new Game();
-
+    public int id;
     public final Player player1;
     public final Player player2;
     private Player curPlayer;
@@ -15,9 +15,9 @@ public class Game {
     private boolean gameOver;
 
     private static final int FLYING_REQ     = 3;
-    private static final int NUM_CHECKERS   = 4;
-    private int unplacedRed = NUM_CHECKERS;
-    private int unplacedBlue = NUM_CHECKERS;
+    private static final int NUM_CHECKERS   = 9;
+    private int unplacedRed;
+    private int unplacedBlue;
 
     public static Game getInstance() {
         return ourInstance;
@@ -26,10 +26,6 @@ public class Game {
     private Game() {
         player1 = new Player("Player 1", Color.RED);
         player2 = new Player("Player 2", Color.BLUE);
-        player1.setStatePlacing();
-        player2.setStatePlacing();
-        board = new Board();
-        gameOver = false;
     }
 
     public void start() {
@@ -41,7 +37,12 @@ public class Game {
             curPlayer = player2;
             player2.activeTurn = true;
         }
+        board = new Board();
         gameOver = false;
+        player1.setStatePlacing();
+        player2.setStatePlacing();
+        unplacedBlue = NUM_CHECKERS;
+        unplacedRed = NUM_CHECKERS;
     }
 
     public List<Checker> getCheckers() {
@@ -86,7 +87,7 @@ public class Game {
         // Prevent moving checkers if not in proper state
         if (!curPlayer.isInPlaceState())
             return null;
-        Checker checker = board.moveChecker(source, destination, getPlacedCheckers(curPlayer.color) < FLYING_REQ);
+        Checker checker = board.moveChecker(source, destination, getPlacedCheckers(curPlayer.color) <= FLYING_REQ);
         if (checker == null)
             return null;
         if (!handleMatchingColors(destination, curPlayer.color)) {
@@ -98,18 +99,18 @@ public class Game {
     public Collection<Checker> removeChecker(Position position) {
         if (!curPlayer.isInRemoveState())
             return null;
-        else
-            System.out.println("removing state");
         Checker checker = board.removeChecker(position, curPlayer.color);
         if (checker == null)
             return null;
-        else
-            System.out.println("failed board action");
         curPlayer.setStatePlacing();
         swapCurrentPlayer();
         // Check remaining for new curPlayer
         if (board.countPlacedCheckersByColor(curPlayer.color) + getUnplacedCheckers(curPlayer.color) <= 2) {
             gameOver = true;
+            player1.activeTurn = player2.activeTurn = false;
+            for (Checker c : board.getPlacedCheckers()) {
+                c.draggable = false;
+            }
         }
         return board.checkers();
     }
@@ -131,22 +132,6 @@ public class Game {
     }
 
     private void swapCurrentPlayer() {
-
-
-        /*
-        // this needs to be fixed slightly
-        if (getNumberOfUnplacedCheckers(player1) == 0 || getNumberOfUnplacedCheckers(player2) == 0) {
-            Collection<Checker> checkers = board.getPlacedCheckers();
-
-            for (Checker checker : checkers) {
-                if (curPlayer.color == checker.color) {
-                    checker.draggable = false;
-                } else {
-                    checker.draggable = true;
-                }
-            }
-        }
-        */
         if (curPlayer.equals(player1)) {
             curPlayer = player2;
             player1.activeTurn = false;
@@ -161,7 +146,6 @@ public class Game {
             c.draggable = curPlayer.color == c.color && getUnplacedCheckers(curPlayer.color) == 0;
         }
     }
-
 
     private void addUnplacedCheckers(Color c, int value) {
         if (c == Color.RED)
