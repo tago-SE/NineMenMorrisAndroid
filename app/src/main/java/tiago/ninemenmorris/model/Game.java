@@ -97,6 +97,21 @@ public class Game {
         return board.checkers();
     }
 
+    public Collection<Checker> removeChecker(Position position) {
+        if (!curPlayer.isInRemoveState())
+            return null;
+        else
+            System.out.println("removing state");
+        Checker checker = board.removeChecker(position, curPlayer.color);
+        if (checker == null)
+            return null;
+        else
+            System.out.println("failed board action");
+        curPlayer.setStatePlacing();
+        swapCurrentPlayer();
+
+        return board.checkers();
+    }
 
     public Player getCurrentPlayer() {
         return curPlayer;

@@ -92,6 +92,19 @@ public class MainViewModel extends ViewModel {
         return false;
     }
 
+    public boolean attemtRemove(Position position) {
+        Player p = game.getCurrentPlayer();
+        Collection<Checker> checkers = game.removeChecker(position);
+        if (checkers != null) {
+            postBoardData(checkers);
+            postPlayerData(p);
+            return true;
+        }
+        System.out.println("NOT REMOVED");
+        return false;
+
+    }
+
     private boolean moveChecker(Position source, Position target) {
         Player p = game.getCurrentPlayer();
         Collection<Checker> checkers = game.moveChecker(source, target);

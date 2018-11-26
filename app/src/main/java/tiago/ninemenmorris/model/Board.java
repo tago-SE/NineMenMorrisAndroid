@@ -85,6 +85,15 @@ public class Board {
         return destChecker;
     }
 
+    public Checker removeChecker(Position position, Color color) {
+        Checker checker = checkerPosMap.get(position);
+        if (checker.color == Color.INVIS || checker.color == color)
+            return null;
+        placedCheckers.remove(checker);
+        checker.color = Color.INVIS;
+        return checker;
+    }
+
     public boolean allAdjacentMatchingColor(Position p, Color c, String angle) {
         List<Position> adjacent = getAdjacent(p, angle);
         Checker c1 = checkerPosMap.get(p);

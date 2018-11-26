@@ -121,12 +121,44 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         });
+        layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+                Log.e(TAG, "V: " + x + " " + y);
+                CheckerView checkerView = getCheckerViewAtPosition(x, y);
+                if (checkerView == null)
+                    return false;
+                mainViewModel.attemtRemove(checkerView.position);
+                return true;
+            }
+        });
+        /*
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int x = (int) (v.getX() + v.getX());
+                int y = (int) (v.getY() + v.getY());
+
+                Log.e(TAG, "V: " + x + " " + y);
+
+               // mainViewModel.attemtRemove();
+            }
+        });
+        */
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mainViewModel.refresh();
+    }
+
+    private void runOnStart() {
+        mapCoordinates();
+        handleObservedCheckers();
+        mainViewModel.start(); // Should be moved to the "start button"
     }
 
     private void setupDrag(final CheckerView view) {
@@ -148,10 +180,12 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
-    private void runOnStart() {
-        mapCoordinates();
-        handleObservedCheckers();
-        mainViewModel.start(); // Should be moved to the "start button"
+    private CheckerView getCheckerViewAtPosition(int x, int y) {
+        for (CheckerView cv : checkerViewList) {
+            if (cv.rect.contains(x, y))
+                return cv;
+        }
+        return null;
     }
 
     @Override
