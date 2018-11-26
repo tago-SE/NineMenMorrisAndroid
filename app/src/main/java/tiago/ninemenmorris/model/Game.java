@@ -11,8 +11,8 @@ public class Game {
     public final Player player1;
     public final Player player2;
     private Player curPlayer;
-    private GameState gameState;
     private Board board;
+    private boolean gameOver;
 
     private static final int FLYING_REQ     = 3;
     private static final int NUM_CHECKERS   = 4;
@@ -28,8 +28,8 @@ public class Game {
         player2 = new Player("Player 2", Color.BLUE);
         player1.setStatePlacing();
         player2.setStatePlacing();
-        gameState = GameState.PAUSED;
         board = new Board();
+        gameOver = false;
     }
 
     public void start() {
@@ -41,7 +41,7 @@ public class Game {
             curPlayer = player2;
             player2.activeTurn = true;
         }
-        gameState = GameState.PLACING;
+        gameOver = false;
     }
 
     public List<Checker> getCheckers() {
@@ -55,10 +55,8 @@ public class Game {
     private boolean handleMatchingColors(Position p, Color c) {
         boolean returnValue = false;
         if (board.allAdjacentMatchingColor(p, c, board.HORIZONTAL)) {
-            System.out.println("MATCHING HORIZONTAL!");
             returnValue = true;
         } else if (board.allAdjacentMatchingColor(p, c, board.VERTICAL)) {
-            System.out.println("MATCHING VERTICAL!");
             returnValue = true;
         }
         if (returnValue) {
@@ -109,8 +107,23 @@ public class Game {
             System.out.println("failed board action");
         curPlayer.setStatePlacing();
         swapCurrentPlayer();
-
+        // Check remaining for new curPlayer
+        if (board.countPlacedCheckersByColor(curPlayer.color) + getUnplacedCheckers(curPlayer.color) <= 2) {
+            gameOver = true;
+        }
         return board.checkers();
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public Player getWinner() {
+        if (!gameOver)
+            return null;
+        if (curPlayer == player1)
+            return player2;
+        return player1;
     }
 
     public Player getCurrentPlayer() {

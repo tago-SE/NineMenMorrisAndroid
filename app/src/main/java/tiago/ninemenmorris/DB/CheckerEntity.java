@@ -1,4 +1,4 @@
 package tiago.ninemenmorris.DB;
 
-public class DBGameEntity {
+public class CheckerEntity {
 }

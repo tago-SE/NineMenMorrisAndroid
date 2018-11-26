@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import tiago.ninemenmorris.R;
+import tiago.ninemenmorris.model.Game;
 
 public class MainActivity extends AppCompatActivity {
 

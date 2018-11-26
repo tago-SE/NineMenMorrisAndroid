@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,8 @@ import java.util.List;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Checker;
 import tiago.ninemenmorris.model.Color;
+import tiago.ninemenmorris.model.Game;
+import tiago.ninemenmorris.model.Player;
 import tiago.ninemenmorris.model.Position;
 import tiago.ninemenmorris.ui.fragments.CheckerView;
 import tiago.ninemenmorris.ui.fragments.PlayerFragment;
@@ -134,19 +137,8 @@ public class GameActivity extends AppCompatActivity {
                 return true;
             }
         });
-        /*
-        layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int x = (int) (v.getX() + v.getX());
-                int y = (int) (v.getY() + v.getY());
 
-                Log.e(TAG, "V: " + x + " " + y);
-
-               // mainViewModel.attemtRemove();
-            }
-        });
-        */
+        handleObservedWinner();
     }
 
     @Override
@@ -225,6 +217,15 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void handleObservedWinner() {
+        mainViewModel.winnerLiveData.observe(this, new Observer<Player>() {
+            @Override
+            public void onChanged(@Nullable Player player) {
+                if (player == null) return;
+                Toast.makeText(context, player.playerName + " has won!", 6).show();
+            }
+        });
+    }
 
     private void handleObservedCheckers() {
         mainViewModel.checkerLiveData.observe(this, new Observer<Collection<Checker>>() {

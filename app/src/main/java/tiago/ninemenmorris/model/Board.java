@@ -22,7 +22,6 @@ public class Board {
             }
         }
 
-
         if (adjacencyMap == null) {
             adjacencyMap = new Hashtable<>();
             // Horizontal mappings
@@ -83,6 +82,15 @@ public class Board {
         placedCheckers.remove(sourceChecker);
         placedCheckers.add(destChecker);
         return destChecker;
+    }
+
+    public int countPlacedCheckersByColor(Color color) {
+        int counter = 0;
+        for (Checker c : placedCheckers) {
+            if (c.color == color)
+                counter++;
+        }
+        return counter;
     }
 
     public Checker removeChecker(Position position, Color color) {

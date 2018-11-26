@@ -18,8 +18,6 @@ public class MainViewModel extends ViewModel {
     private static final String TAG = "MainVM";
 
     // Current player change
-    @Deprecated
-    public final MutableLiveData<Player> currentPlayerLiveData = new MutableLiveData<>();
     // Player data change
     public final MutableLiveData<Player> player0LiveData = new MutableLiveData<>();
     public final MutableLiveData<Player> player1LiveData = new MutableLiveData<>();
@@ -29,6 +27,8 @@ public class MainViewModel extends ViewModel {
     // Checker Board changes
     public final MutableLiveData<Collection<Checker>> checkerLiveData = new MutableLiveData<>();
 
+    public final MutableLiveData<Player> winnerLiveData = new MutableLiveData<>();
+
     private Game game;
 
 
@@ -36,6 +36,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
         game = Game.getInstance();
         checkerLiveData.setValue(game.getCheckers());
+        winnerLiveData.setValue(null);
 
     }
 
@@ -71,6 +72,7 @@ public class MainViewModel extends ViewModel {
         */
         // Update current active player
        // currentPlayerLiveData.postValue(game.getCurrentPlayer());
+        winnerLiveData.setValue(null);
     }
 
     public boolean select(Position source, Position destination) {
@@ -98,9 +100,12 @@ public class MainViewModel extends ViewModel {
         if (checkers != null) {
             postBoardData(checkers);
             postPlayerData(p);
+            if (game.isGameOver()) {
+                winnerLiveData.setValue(game.getWinner());
+
+            }
             return true;
         }
-        System.out.println("NOT REMOVED");
         return false;
 
     }
@@ -147,4 +152,8 @@ public class MainViewModel extends ViewModel {
     public boolean isOccupied(Position p) {
         return game.getBoard().isOccupied(p);
     }
+
+
+
+
 }
