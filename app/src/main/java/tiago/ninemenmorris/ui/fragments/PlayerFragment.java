@@ -159,6 +159,8 @@ public class PlayerFragment extends Fragment {
             playerText.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             if (lastRemaining != 0)
                 checkerView.draggable = true;
+            if (player.isInRemoveState())
+                checkerView.draggable = false;
         } else {
             playerText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
             checkerView.draggable = false;

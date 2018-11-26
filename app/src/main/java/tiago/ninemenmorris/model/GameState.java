@@ -29,7 +29,9 @@ public enum GameState {
      *  from any point to any vacant point.
      */
 
-    PAUSED;
+    PAUSED,
     /* Neither play is able to interact with the game in this stage.
     */
+    DELETING;
+
 }

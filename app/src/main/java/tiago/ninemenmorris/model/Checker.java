@@ -5,9 +5,15 @@ import java.util.List;
 
 public class Checker {
 
-    protected final Color color;
+    protected Color color;
     protected boolean draggable;
     protected Position position;
+
+    public Checker(Position position, Color color, boolean draggable) {
+        this.position = position;
+        this.color = color;
+        this.draggable = draggable;
+    }
 
     public Checker(Color color, boolean draggable) {
         this.color = color;
@@ -26,12 +32,20 @@ public class Checker {
         return position;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public void setDraggable(boolean draggable) {
+        this.draggable = draggable;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
     @Override
     public String toString() {
-        return "Checker{" +
-                "color=" + color +
-                ", draggable=" + draggable +
-                ", position=" + position +
-                '}';
+        return "{" + position + ',' + color + ',' + draggable  + '}';
     }
 }

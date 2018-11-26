@@ -1,112 +1,106 @@
 package tiago.ninemenmorris.model;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
 public class Board {
 
-    private static final String TAG = "Board";
-
-    private List<Checker> unplacedBlues = new ArrayList<>();
-    private List<Checker> unplacedReds = new ArrayList<>();
-    private Hashtable<Position, Checker> placedCheckers = new Hashtable<>();
+    private final List<Checker> placedCheckers = new ArrayList<>();
+    private final Hashtable<Position, Checker> checkerPosMap = new Hashtable<>();
     private static Hashtable<String, List<Position>> adjacencyMap = null;
-    private static final int NUM_CHECKERS = 1;
-
     public static final String HORIZONTAL   = "H";
     public static final String VERTICAL     = "V";
 
+
     public Board() {
-        for (int i = 0; i < NUM_CHECKERS; i++) {
-            unplacedReds.add(new Checker(Color.RED, false));
-            unplacedBlues.add(new Checker(Color.BLUE, false));
+        for (Position p : Position.values()) {
+            if (p != Position.UNPLACED) {
+                Checker c = new Checker(p, Color.INVIS, false);
+                checkerPosMap.put(p, c);
+            }
         }
+
+
         if (adjacencyMap == null) {
             adjacencyMap = new Hashtable<>();
             // Horizontal mappings
-            map(Position.A1, HORIZONTAL, Position.D1, Position.G1);
-            map(Position.B2, HORIZONTAL, Position.D2, Position.F2);
-            map(Position.C3, HORIZONTAL, Position.D3, Position.E3);
-            map(Position.A4, HORIZONTAL, Position.B4, Position.C4);
-            map(Position.E4, HORIZONTAL, Position.F4, Position.G4);
-            map(Position.C5, HORIZONTAL, Position.D5, Position.E5);
-            map(Position.B6, HORIZONTAL, Position.D6, Position.F6);
-            map(Position.A7, HORIZONTAL, Position.D7, Position.G7);
+            mapAdjacency(Position.A1, HORIZONTAL, Position.D1, Position.G1);
+            mapAdjacency(Position.B2, HORIZONTAL, Position.D2, Position.F2);
+            mapAdjacency(Position.C3, HORIZONTAL, Position.D3, Position.E3);
+            mapAdjacency(Position.A4, HORIZONTAL, Position.B4, Position.C4);
+            mapAdjacency(Position.E4, HORIZONTAL, Position.F4, Position.G4);
+            mapAdjacency(Position.C5, HORIZONTAL, Position.D5, Position.E5);
+            mapAdjacency(Position.B6, HORIZONTAL, Position.D6, Position.F6);
+            mapAdjacency(Position.A7, HORIZONTAL, Position.D7, Position.G7);
             // Vertical mappings
-            map(Position.A1, VERTICAL, Position.A4, Position.A7);
-            map(Position.B2, VERTICAL, Position.B4, Position.B6);
-            map(Position.C3, VERTICAL, Position.C4, Position.C5);
-            map(Position.D1, VERTICAL, Position.D2, Position.D3);
-            map(Position.D5, VERTICAL, Position.D6, Position.D7);
-            map(Position.E3, VERTICAL, Position.E4, Position.E5);
-            map(Position.F2, VERTICAL, Position.F4, Position.F6);
-            map(Position.G1, VERTICAL, Position.G4, Position.G7);
+            mapAdjacency(Position.A1, VERTICAL, Position.A4, Position.A7);
+            mapAdjacency(Position.B2, VERTICAL, Position.B4, Position.B6);
+            mapAdjacency(Position.C3, VERTICAL, Position.C4, Position.C5);
+            mapAdjacency(Position.D1, VERTICAL, Position.D2, Position.D3);
+            mapAdjacency(Position.D5, VERTICAL, Position.D6, Position.D7);
+            mapAdjacency(Position.E3, VERTICAL, Position.E4, Position.E5);
+            mapAdjacency(Position.F2, VERTICAL, Position.F4, Position.F6);
+            mapAdjacency(Position.G1, VERTICAL, Position.G4, Position.G7);
         }
     }
 
-    public boolean isOccupied(Position position) {
-        return placedCheckers.containsKey(position);
+    public boolean isOccupied(Position p) {
+        return checkerPosMap.get(p).color != Color.INVIS;
     }
 
-    public Checker placeChecker(Position position, Color color) {
-        if (isOccupied(position))
-            return null;
-        Checker checker;
-        if (color == Color.RED && unplacedReds.size() > 0)
-            checker = unplacedReds.remove(0);
-        else if (color == Color.BLUE && unplacedBlues.size() > 0)
-            checker = unplacedBlues.remove(0);
-        else
-            return null;
-        placedCheckers.put(position, checker);
-        checker.position = position;
-        // Debug
-        Log.w(TAG, "placed checker {" + color.toString() + "@" + position.toString() + "}");
-        return checker;
-    }
-
-    public Checker moveChecker(Position source, Position destination) {
-        Checker checker = placedCheckers.get(source);
-        if (checker == null)
-            return checker;
-        if (isOccupied(destination))
-            return null;
-        placedCheckers.remove(source);
-        placedCheckers.put(destination, checker);
-        checker.position = destination;
-        return checker;
+    public List<Checker> checkers() {
+        return new ArrayList(checkerPosMap.values());
     }
 
     public Collection<Checker> getPlacedCheckers() {
-        return placedCheckers.values();
+        return placedCheckers;
     }
 
-    public void remove(Position position) {
-        placedCheckers.remove(position);
-    }
-
-    public Checker get(Position position) {
-        return placedCheckers.get(position);
-    }
-
-    public List<Position> getAdjacent(Position srcsPosition, String angle) {
+    private List<Position> getAdjacent(Position srcsPosition, String angle) {
         return adjacencyMap.get(srcsPosition + angle);
     }
 
-    public int getNumUnplacedReds() {
-        return unplacedReds.size();
+    public Checker placeChecker(Position p, Color c) {
+        Checker checker = checkerPosMap.get(p);
+        if (checker.color != Color.INVIS && c != Color.INVIS)
+            return null;
+        checker.color = c;
+        placedCheckers.add(checker);
+        return checker;
     }
 
-    public int getNumUnplacedBlues() {
-        return unplacedBlues.size();
+    public Checker moveChecker(Position source, Position destination, boolean flying) {
+        Checker destChecker = checkerPosMap.get(destination);
+        Checker sourceChecker = checkerPosMap.get(source);
+        // Check for adjacent blabla ignore if flying
+        if ((sourceChecker.color == Color.INVIS && destChecker.color != Color.INVIS) ||
+                (!flying && !getAdjacent(source, HORIZONTAL).contains(destination) && !getAdjacent(source, VERTICAL).contains(destination)))
+            return null;
+        destChecker.color = sourceChecker.color;
+        sourceChecker.color = Color.INVIS;
+        placedCheckers.remove(sourceChecker);
+        placedCheckers.add(destChecker);
+        return destChecker;
     }
 
-    private void map(Position p1, String angle, Position p2, Position p3) {
+    public boolean allAdjacentMatchingColor(Position p, Color c, String angle) {
+        List<Position> adjacent = getAdjacent(p, angle);
+        Checker c1 = checkerPosMap.get(p);
+        Checker c2 = checkerPosMap.get(adjacent.get(0));
+        Checker c3 = checkerPosMap.get(adjacent.get(1));
+        return c1.color == c2.color && c2.color == c3.color;
+    }
+
+    @Override
+    public String toString() {
+        return "Board2{" +
+                "checkers=" + checkerPosMap.values() +
+                '}';
+    }
+
+    private static void mapAdjacency(Position p1, String angle, Position p2, Position p3) {
         List<Position> l1 = new ArrayList<>();
         l1.add(p2);
         l1.add(p3);
@@ -122,4 +116,5 @@ public class Board {
         l3.add(p2);
         adjacencyMap.put(p3 + angle, l3);
     }
+
 }

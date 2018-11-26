@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
+    <Button
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="startGame"
+        android:text="@string/play" />
+
 </android.support.constraint.ConstraintLayout>

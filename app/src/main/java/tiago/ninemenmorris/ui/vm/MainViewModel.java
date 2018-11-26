@@ -35,37 +35,92 @@ public class MainViewModel extends ViewModel {
 
     public MainViewModel() {
         game = Game.getInstance();
+        checkerLiveData.setValue(game.getCheckers());
+
     }
 
     static boolean startOnceOnly = true;
 
     public void refresh() {
-        checkerLiveData.postValue(game.getPlacedCheckers());
-        remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
-        remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
+        //checkerLiveData.postValue(game.getPlacedCheckers());
+        //remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
+        //remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
     }
 
     public void start() {
-        if (!startOnceOnly)
+       if (!startOnceOnly)
             return;
         startOnceOnly = false;
 
         Log.w(TAG, "start...");
         // Update player info
 
-        checkerLiveData.setValue(null);
-
 
         game.start();
-        player0LiveData.postValue(game.player1);
-        player1LiveData.postValue(game.player2);
-        remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
-        remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
+        postBoardData(game.getCheckers());
+        postPlayerData(game.player1);
+        postPlayerData(game.player2);
+        //player0LiveData.postValue(game.player1);
+        //player1LiveData.postValue(game.player2);
+        //remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
+        //remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
+
+        //checkerLiveData.postValue(game.getCheckers());
         /*
 
         */
         // Update current active player
-        currentPlayerLiveData.postValue(game.getCurrentPlayer());
+       // currentPlayerLiveData.postValue(game.getCurrentPlayer());
+    }
+
+    public boolean select(Position source, Position destination) {
+        if (source == null) {
+            return placeChecker(destination);
+        } else {
+            return moveChecker(source, destination);
+        }
+    }
+
+    private boolean placeChecker(Position target) {
+        Player p = game.getCurrentPlayer();
+        Collection<Checker> checkers = game.placeChecker(target);
+        if (checkers != null){
+            postPlayerData(p);
+            postBoardData(checkers);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean moveChecker(Position source, Position target) {
+        Player p = game.getCurrentPlayer();
+        Collection<Checker> checkers = game.moveChecker(source, target);
+        if (checkers != null){
+            postPlayerData(p);
+            postBoardData(checkers);
+            return true;
+        }
+        return false;
+    }
+
+
+    private void postPlayerData(Player p) {
+        if (p.color == Color.RED){
+            remainingRedLiveData.postValue(game.getUnplacedCheckers(p.color));
+        } else{
+            remainingBlueLiveData.postValue(game.getUnplacedCheckers(p.color));
+        }
+        // Update that player data has changed
+        player0LiveData.postValue(game.player1);
+        player1LiveData.postValue(game.player2);
+    }
+
+    private void postBoardData(Collection<Checker> checkers) {
+        checkerLiveData.postValue(checkers);
+    }
+
+    public Collection<Checker> getCheckers() {
+        return game.getCheckers();
     }
 
     public Player getPlayerRed() {
@@ -76,33 +131,7 @@ public class MainViewModel extends ViewModel {
         return game.player2;
     }
 
-    public void dropChecker(Position source, Position destination) {
-        if (destination == null)
-            throw new NullPointerException("no destination provided");
-        Player p = game.getCurrentPlayer();
-        Checker returnedChecker = null;
-        // if source is null then it's a place checker event, otherwise it tries to move a checker
-        // at the given source to the provided destination.
-        Collection<Checker> collection = null;
-        if (source == null) {
-            Log.w(TAG, "place: " + destination);
-            collection = game.placeChecker(destination);
-        } else {
-            Log.w(TAG, "move: " + source + ":" +  destination);
-            collection = game.moveChecker(source, destination);
-        }
-        // If the returned checker is not null then the move was accepted and the data changes are
-        // published to the view
-        if (collection != null){
-            if (p.color == Color.RED){
-                remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(p));
-            } else{
-                remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(p));
-            }
-            // Update that player data has changed
-            player0LiveData.postValue(game.player1);
-            player1LiveData.postValue(game.player2);
-            checkerLiveData.postValue(collection);
-        }
+    public boolean isOccupied(Position p) {
+        return game.getBoard().isOccupied(p);
     }
 }

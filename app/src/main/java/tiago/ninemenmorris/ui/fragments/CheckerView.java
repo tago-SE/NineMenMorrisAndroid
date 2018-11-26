@@ -3,6 +3,7 @@ package tiago.ninemenmorris.ui.fragments;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,11 @@ import tiago.ninemenmorris.model.Position;
 public class CheckerView extends ImageView {
 
     public boolean draggable = false;
-
     public final Position position;
+    public final int x;
+    public final int y;
+    public final int size;
+    public final Rect rect;
 
     public CheckerView(Context context, int x, int y, int size, Position position) {
         super(context);
@@ -28,6 +32,10 @@ public class CheckerView extends ImageView {
         setX(x);
         setY(y);
         this.position = position;
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.rect = new Rect(x, y, x + size, y + size);
     }
 
     public void paintRed() {
@@ -59,6 +67,9 @@ public class CheckerView extends ImageView {
         return "CheckerView{" +
                 "draggable=" + draggable +
                 ", position=" + position +
+                ", x=" + x +
+                ", y=" + y +
+                ", size=" + size +
                 '}';
     }
 }
