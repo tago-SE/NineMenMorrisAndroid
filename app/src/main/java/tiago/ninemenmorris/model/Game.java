@@ -83,9 +83,9 @@ public class Game {
 
     private boolean handleMatchingColors(Position p, Color c) {
         boolean returnValue = false;
-        if (board.allAdjacentMatchingColor(p, c, board.HORIZONTAL)) {
+        if (board.foundMatchingMill(p, c, board.HORIZONTAL)) {
             returnValue = true;
-        } else if (board.allAdjacentMatchingColor(p, c, board.VERTICAL)) {
+        } else if (board.foundMatchingMill(p, c, board.VERTICAL)) {
             returnValue = true;
         }
         if (returnValue) {
