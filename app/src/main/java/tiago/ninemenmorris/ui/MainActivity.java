@@ -19,15 +19,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // Setup default game configuration based on preferences
         Game game = Game.getInstance();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
         game.player2.name = prefs.getString("prefPlayer2name", "Player 2");
         Game.getInstance().start();
+        // Start next activity
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
+        finish();
     }
 
 
