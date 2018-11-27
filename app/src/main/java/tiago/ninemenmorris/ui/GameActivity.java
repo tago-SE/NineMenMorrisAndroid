@@ -109,6 +109,17 @@ public class GameActivity extends AppCompatActivity {
             case R.id.restart:
                 mainViewModel.start();
                 return true;
+            case R.id.newgame:
+                Intent intent = new Intent(this, GameSettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.loadgame:
+                // Load Game Activity
+                Log.e(TAG, "Load - not yet implemented");
+                return true;
+            case R.id.gamepref:
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

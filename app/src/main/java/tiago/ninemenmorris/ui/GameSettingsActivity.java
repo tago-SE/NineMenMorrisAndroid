@@ -32,7 +32,7 @@ public class GameSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_settings);
         spinnerUnplaced = findViewById(R.id.unplacedCheckerSpin);
         spinnerUnplaced.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, createEntries(6, 15)));
-        spinnerUnplaced.setSelection(9 - 5);
+        spinnerUnplaced.setSelection(9 - 6);
         spinnerFlying = findViewById(R.id.unplacedFlyingCondSpin);
         spinnerFlying.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, createEntries(3, 15)));
         spinnerFlying.setSelection(0);

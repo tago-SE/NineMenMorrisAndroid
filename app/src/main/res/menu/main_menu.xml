@@ -5,11 +5,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="tiago.weatherforecast.MainActivity.view.MainActivity">
     <item
+        android:id="@+id/newgame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orderInCategory="100"
+        android:title="@string/newgame"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/loadgame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orderInCategory="100"
+        android:title="@string/load"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/restart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orderInCategory="100"
         android:title="@string/restart"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/gamepref"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orderInCategory="100"
+        android:title="@string/gamepref"
         app:showAsAction="never" />
 
 </menu>
