@@ -1,6 +1,8 @@
 package tiago.ninemenmorris.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +43,11 @@ public class GameSettingsActivity extends AppCompatActivity {
         spinnerDefaet.setSelection(0);
         txtPlayer1 = findViewById(R.id.playerName1);
         txtPlayer2 = findViewById(R.id.playerName2);
+
+        // Load preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        txtPlayer1.setText(prefs.getString("prefPlayer1name", "Player 1"));
+        txtPlayer2.setText(prefs.getString("prefPlayer2name", "Player 2"));
     }
 
     private List<String> createEntries(int start, int end) {

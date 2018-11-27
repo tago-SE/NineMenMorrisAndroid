@@ -69,6 +69,8 @@ public class Game {
         player2.setStatePlacing();
         unplacedBlue = startingCheckers;
         unplacedRed = startingCheckers;
+
+
     }
 
     public List<Checker> getCheckers() {

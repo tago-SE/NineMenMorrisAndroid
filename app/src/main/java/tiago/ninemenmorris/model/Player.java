@@ -18,7 +18,7 @@ public class Player {
         wins = 0;
         activeTurn = false;
         state = State.PLACING;
-    }
+}
 
     public void setStatePlacing() {
         state = State.PLACING;
