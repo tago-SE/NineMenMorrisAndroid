@@ -1,5 +1,6 @@
 package tiago.ninemenmorris.ui;
 
+import android.animation.ObjectAnimator;
 import android.arch.lifecycle.Observer;
 import android.content.ClipDescription;
 import android.content.Context;
@@ -174,6 +175,7 @@ public class GameActivity extends AppCompatActivity {
     private void SetupPostBoardViewRescale() {
         mapCoordinatesOnScreen();
         handleObservedCheckers();
+        handleObservedRemovedCheckers();
         layout.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -240,6 +242,13 @@ public class GameActivity extends AppCompatActivity {
         mainViewModel.refresh();
     }
 
+    private CheckerView getCheckerMatching(Position p) {
+        for (CheckerView cv : checkerViewList) {
+            if (cv.position == p)
+                return cv;
+        }
+        return null;
+    }
 
     private CheckerView getCheckerViewAtPosition(int x, int y) {
         for (CheckerView cv : checkerViewList) {
@@ -266,6 +275,20 @@ public class GameActivity extends AppCompatActivity {
                 if (checkers == null)
                     return;
                 paintBoard(checkers);
+            }
+        });
+    }
+
+    private void handleObservedRemovedCheckers() {
+        mainViewModel.removedChecker.observe(this, new Observer<Checker>() {
+            @Override
+            public void onChanged(@Nullable Checker checker) {
+                if (checker == null) return;
+                CheckerView cv = getCheckerMatching(checker.getPosition());
+                checkerViewList.remove(cv);
+                ObjectAnimator anim = ObjectAnimator.ofFloat(cv, "translationY", screenSize.y);
+                anim.setDuration(1000);
+                anim.start();
             }
         });
     }

@@ -3,7 +3,7 @@ package tiago.ninemenmorris.ui.vm;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
-
+import android.arch.lifecycle.LiveData;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,7 +17,6 @@ public class MainViewModel extends ViewModel {
 
     private static final String TAG = "MainVM";
 
-    // Current player change
     // Player data change
     public final MutableLiveData<Player> player0LiveData = new MutableLiveData<>();
     public final MutableLiveData<Player> player1LiveData = new MutableLiveData<>();
@@ -26,9 +25,11 @@ public class MainViewModel extends ViewModel {
     public final MutableLiveData<Integer> remainingBlueLiveData = new MutableLiveData<>();
     // Checker Board changes
     public final MutableLiveData<Collection<Checker>> checkerLiveData = new MutableLiveData<>();
-
-    public final MutableLiveData<Player> winnerLiveData = new MutableLiveData<>();
-
+    // Observable for winning players
+    public final SingleLiveEvent<Player> winnerLiveData = new SingleLiveEvent<>();
+    // Observable for removed checkers
+    public final SingleLiveEvent<Checker> removedChecker = new SingleLiveEvent<>();
+    // Singleton instance of mode class Game
     private Game game;
 
     public MainViewModel() {
@@ -75,11 +76,14 @@ public class MainViewModel extends ViewModel {
         Player p = game.getCurrentPlayer();
         Collection<Checker> checkers = game.removeChecker(position);
         if (checkers != null) {
+            // informs of the deleted checker
+            removedChecker.postValue(game.getLastRemovedChecker());
+            // informs that the board needs to be updated
             postBoardData(checkers);
+            // informs that player data needs to be updated
             postPlayerData(p);
             if (game.isGameOver()) {
                 winnerLiveData.setValue(game.getWinner());
-
             }
             return true;
         }
@@ -112,10 +116,6 @@ public class MainViewModel extends ViewModel {
 
     private void postBoardData(Collection<Checker> checkers) {
         checkerLiveData.postValue(checkers);
-    }
-
-    public Collection<Checker> getCheckers() {
-        return game.getCheckers();
     }
 
     public Player getPlayerRed() {

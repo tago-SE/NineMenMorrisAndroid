@@ -23,6 +23,9 @@ public class Game {
     private int unplacedRed;
     // Number of unplaced blue checkers
     private int unplacedBlue;
+    // Last removed checker
+    private Checker lastRemovedChecker;
+
 
     public static Game getInstance() {
         return ourInstance;
@@ -43,6 +46,10 @@ public class Game {
 
     public void setLoseCondition(int loseCondition) {
         this.loseCondition = loseCondition;
+    }
+
+    public Checker getLastRemovedChecker() {
+        return lastRemovedChecker;
     }
 
     public void start() {
@@ -118,8 +125,8 @@ public class Game {
     public Collection<Checker> removeChecker(Position position) {
         if (!curPlayer.isInRemoveState())
             return null;
-        Checker checker = board.removeChecker(position, curPlayer.color);
-        if (checker == null)
+        lastRemovedChecker = board.removeChecker(position, curPlayer.color);
+        if (lastRemovedChecker == null)
             return null;
         curPlayer.setStatePlacing();
         swapCurrentPlayer();
