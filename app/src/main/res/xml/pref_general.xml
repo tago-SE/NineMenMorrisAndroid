@@ -18,24 +18,34 @@
         android:title="Player 2 name" />
 
     <ListPreference
-        android:defaultValue="180"
-        android:entries="@array/pref_sync_frequency_titles"
-        android:entryValues="@array/pref_sync_frequency_values"
-        android:key="sync_frequency"
+        android:defaultValue="-1"
+        android:entries="@array/pref_unplaced_checkers"
+        android:entryValues="@array/pref_unplaced_checkers"
+        android:key="unplaced_checkers"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_sync_frequency" />
+        android:title="Unplaced Checkers" />
 
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
         android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
-        android:key="example_list"
+        android:entries="@array/pref_flying_cond"
+        android:entryValues="@array/pref_flying_cond"
+        android:key="flying_cond"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages" />
+        android:title="Flying Condition" />
+    <ListPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="-1"
+        android:entries="@array/pref_victory_cond"
+        android:entryValues="@array/pref_victory_cond"
+        android:key="victory_cond"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="Victory Condition" />
 
 </PreferenceScreen>

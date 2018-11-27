@@ -2,6 +2,8 @@ package tiago.ninemenmorris.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
@@ -32,29 +36,42 @@ public class GameSettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_settings);
-        spinnerUnplaced = findViewById(R.id.unplacedCheckerSpin);
-        spinnerUnplaced.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, createEntries(6, 15)));
-        spinnerUnplaced.setSelection(9 - 6);
-        spinnerFlying = findViewById(R.id.unplacedFlyingCondSpin);
-        spinnerFlying.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, createEntries(3, 15)));
-        spinnerFlying.setSelection(0);
-        spinnerDefaet = findViewById(R.id.winCondSpin);
-        spinnerDefaet.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, createEntries(2, 6)));
-        spinnerDefaet.setSelection(0);
+
+        // Fetc preferences and resources
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Resources res = getResources();
+        List<String> unplacedList = Arrays.asList(res.getStringArray(R.array.pref_unplaced_checkers));
+        List<String> flyingList = Arrays.asList(res.getStringArray(R.array.pref_flying_cond));
+        List<String> victoryList = Arrays.asList(res.getStringArray(R.array.pref_victory_cond));
+
         txtPlayer1 = findViewById(R.id.playerName1);
         txtPlayer2 = findViewById(R.id.playerName2);
-
-        // Load preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         txtPlayer1.setText(prefs.getString("prefPlayer1name", "Player 1"));
         txtPlayer2.setText(prefs.getString("prefPlayer2name", "Player 2"));
+
+        spinnerUnplaced = findViewById(R.id.unplacedCheckerSpin);
+        spinnerUnplaced.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                unplacedList));
+        spinnerUnplaced.setSelection(getSelectionIndex(unplacedList, prefs.getString("unplaced_checkers", "0")));
+
+        spinnerFlying = findViewById(R.id.unplacedFlyingCondSpin);
+        spinnerFlying.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                flyingList));
+        spinnerFlying.setSelection(getSelectionIndex(flyingList, prefs.getString("flying_cond", "0")));
+
+        spinnerDefaet = findViewById(R.id.winCondSpin);
+        spinnerDefaet.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                victoryList));
+        spinnerDefaet.setSelection(getSelectionIndex(victoryList, prefs.getString("victory_cond", "0")));
     }
 
-    private List<String> createEntries(int start, int end) {
-        List<String> entries = new ArrayList<>();
-        for (int i = start; i < end; i++)
-            entries.add("" + i);
-        return entries;
+    private int getSelectionIndex(List<String> list, String current) {
+        int firstIndex = Integer.parseInt(list.get(0));
+        int currentIndex = Integer.parseInt(current);
+        return currentIndex - firstIndex;
     }
 
     public void startGame(View view) {

@@ -182,6 +182,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference("prefPlayer1name"));
             bindPreferenceSummaryToValue(findPreference("prefPlayer2name"));
+            bindPreferenceSummaryToValue(findPreference("unplaced_checkers"));
+            bindPreferenceSummaryToValue(findPreference("flying_cond"));
+            bindPreferenceSummaryToValue(findPreference("victory_cond"));
         }
 
         @Override
