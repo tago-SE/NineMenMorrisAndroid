@@ -5,6 +5,7 @@ import android.content.ClipDescription;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.arch.lifecycle.ViewModelProviders;
@@ -16,8 +17,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -56,15 +60,15 @@ public class GameActivity extends AppCompatActivity {
 
     private Hashtable<Position, Point> pointMap = null;
     private int checkerSize;
+    private int boardSize;
+    private Point screenSize;
 
     private final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.w(TAG, "onCreate:");
         setContentView(R.layout.pmain_activity);
-
         layout = findViewById(R.id.container);
         boardView = findViewById(R.id.board);
 
@@ -81,15 +85,95 @@ public class GameActivity extends AppCompatActivity {
 
         // Get screen dimensions
         Display display = getWindowManager().getDefaultDisplay();
-        Point screenSize = new Point();
+        screenSize = new Point();
         display.getSize(screenSize);
+        handleObservedWinner();
+    }
 
-        Log.e(TAG, "BW" + boardView.getWidth());
-        Log.e(TAG, "BX" + boardView.getX());
-        Log.e(TAG, "BY" + boardView.getY());
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mainViewModel.refresh();
+    }
 
-        Log.w(TAG, "Screen: (" + screenSize.x + "," + screenSize.y + ")");
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.restart:
+                mainViewModel.start();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+    private void setupDrag(final CheckerView view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Save the position as clip data to be retrieved on drop
+                    ClipData.Item item = new ClipData.Item("" + view.position);
+                    ClipData data = new ClipData("", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    // Start drag
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        view.startDragAndDrop(data, shadowBuilder, null, 0);
+                    } else {
+                        view.startDrag(data, shadowBuilder, null, 0);
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        (new Handler()).post(new Runnable() {
+            @Override
+            public void run() {
+                // Changes the boardSize to match the screen dimensions
+                boardSize = (int) ((screenSize.x > screenSize.y ? screenSize.y : screenSize.x)*0.72);
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
+                    boardParam.height = boardSize;
+                    boardParam.width = boardSize;
+                    boardView.setLayoutParams(boardParam);
+                    boardView.invalidate();
+                } else {
+                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
+                    boardParam.height = boardSize;
+                    boardParam.width = boardSize;
+                    boardView.setLayoutParams(boardParam);
+                    boardView.invalidate();
+                }
+                // This section of the code needs to run post onStart so that boardView.width and
+                // boardView.height has been properly updated.
+                (new Handler()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                       // Setup after boardView was enlarged
+                        SetupPostBoardViewRescale();
+                    }
+                });
+            }
+        });
+    }
+
+    private void SetupPostBoardViewRescale() {
+        mapCoordinatesOnScreen();
+        handleObservedCheckers();
         layout.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -108,18 +192,29 @@ public class GameActivity extends AppCompatActivity {
                         int x = (int) (event.getX() + layout.getX());
                         int y = (int) (event.getY() + layout.getY());
                         Log.w(TAG, "Dropped at: " + x + "," + y);
-                        for (CheckerView cv : checkerViewList) {
-                            if (cv.rect.contains(x, y)) {
-                                if (mainViewModel.isOccupied(cv.position))
-                                    return false; // unsuccessful drop
-                                // get stored source position inside clip data if any exists
-                                String data = (String) event.getClipData().getItemAt(0).getText();
-                                Position source = null;
-                                Position target = cv.position;
-                                if (!data.equals(""))
-                                    source = Position.valueOf(data);
-                                return mainViewModel.select(source, target);
+                        CheckerView checkerView = getCheckerViewAtPosition(x, y);
+                        if (checkerView == null)
+                            return false;
+                        // Handle Drop Checker event
+                        if (checkerView.rect.contains(x, y)) {
+                            if (mainViewModel.isOccupied(checkerView.position))
+                                return false; // unsuccessful drop
+                            // get stored source position inside clip data if any exists
+                            String data = (String) event.getClipData().getItemAt(0).getText();
+                            Position source = null;
+                            Position target = checkerView.position;
+                            if (!data.equals(""))
+                                source = Position.valueOf(data);
+                            if (mainViewModel.select(source, target)) {
+                                // Follow up actions if place / move was successful
+                                Log.w(TAG, "OnPlace/Move");
+                                Player player = mainViewModel.getCurrentPlayer();
+                                if (player.isInRemoveState()) {
+                                    Toast.makeText(context, player.color + " may remove opponent checker.", 4).show();
+                                }
+                                return true;
                             }
+                            return false;
                         }
                         return false; // No droppable nodes found
                     default:
@@ -132,42 +227,19 @@ public class GameActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 int x = (int) event.getX();
                 int y = (int) event.getY();
-                Log.e(TAG, "V: " + x + " " + y);
                 CheckerView checkerView = getCheckerViewAtPosition(x, y);
                 if (checkerView == null)
                     return false;
-                mainViewModel.attemtRemove(checkerView.position);
+                if (mainViewModel.attemtRemove(checkerView.position)) {
+                    // Follow up actions if the remove was successful
+                    Log.w(TAG, "OnRemove");
+                }
                 return true;
             }
         });
-
-        handleObservedWinner();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
         mainViewModel.refresh();
     }
 
-    private void setupDrag(final CheckerView view) {
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    // Save the position as clip data to be retrieved on drop
-                    ClipData.Item item = new ClipData.Item("" + view.position);
-                    ClipData data = new ClipData("", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-                    // Start drag
-                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                    view.startDragAndDrop(data, shadowBuilder, null, 0);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-    }
 
     private CheckerView getCheckerViewAtPosition(int x, int y) {
         for (CheckerView cv : checkerViewList) {
@@ -177,60 +249,12 @@ public class GameActivity extends AppCompatActivity {
         return null;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        (new Handler()).post(new Runnable() {
-            @Override
-            public void run() {
-                mapCoordinates();
-                handleObservedCheckers();
-                mainViewModel.refresh();
-            }
-        });
-
-        /*
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            boardView.post(new Runnable() {
-                @Override
-                public void run() {
-                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
-                    boardParam.height = boardView.getWidth();
-                    boardParam.width = boardView.getWidth();
-                    boardView.setLayoutParams(boardParam);
-                    //setupBoardNodes();
-                    //mapCoordinates();
-                    runOnStart();
-                    boardView.postInvalidate();
-                    //mainViewModel.refresh();
-                }
-            });
-
-        } else {
-            boardView.post(new Runnable() {
-                @Override
-                public void run() {
-                    ViewGroup.LayoutParams boardParam = boardView.getLayoutParams();
-                    boardParam.width = boardView.getHeight();
-                    boardParam.height = boardView.getHeight();
-                    boardView.setLayoutParams(boardParam);
-                    //setupBoardNodes();
-                   //mapCoordinates();
-                    runOnStart();
-                    boardView.postInvalidate();
-                    //mainViewModel.refresh();
-                }
-            });
-        }
-        */
-    }
-
     private void handleObservedWinner() {
         mainViewModel.winnerLiveData.observe(this, new Observer<Player>() {
             @Override
             public void onChanged(@Nullable Player player) {
                 if (player == null) return;
-                Toast.makeText(context, player.playerName + " has won!", 4).show();
+                Toast.makeText(context, player.name + " has won!", 4).show();
             }
         });
     }
@@ -259,10 +283,10 @@ public class GameActivity extends AppCompatActivity {
             Position coordinate = checker.getPosition();
             Point p = pointMap.get(coordinate);
             final CheckerView checkerView = new CheckerView(context, p.x, p.y, checkerSize, coordinate);
-            if (color == Color.RED) {
+            if (color == Color.Red) {
                 checkerView.paintRed();
                 checkerView.show();
-            } else if (color == Color.BLUE) {
+            } else if (color == Color.Blue) {
                 checkerView.paintBlue();
                 checkerView.show();
             } else {
@@ -277,10 +301,17 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    private void mapCoordinates() {
+    private void mapCoordinatesOnScreen() {
         if (pointMap != null)
             return;
         // Setup
+
+        Log.w(TAG, ": Map coordinates");
+        Log.w(TAG, "maxSize: " + boardSize);
+        Log.w(TAG, "board width: " + boardView.getWidth());
+        Log.w(TAG, "board height: " + boardView.getHeight());
+
+
         checkerSize = (int) (boardView.getWidth()*circleFactor);
         int leftX = (int) boardView.getX() - checkerSize/2;
         int midX = leftX + boardView.getWidth()/2;
@@ -289,9 +320,6 @@ public class GameActivity extends AppCompatActivity {
         int midY =  topY + boardView.getWidth()/2;
         int botY = topY + boardView.getWidth();
         int d1 = (int) (boardView.getWidth()*0.17);
-
-        Log.w(TAG, "board width: " + boardView.getWidth());
-        Log.w(TAG, "board height: " + boardView.getHeight());
 
         // Map coordinates
         pointMap = new Hashtable<>();

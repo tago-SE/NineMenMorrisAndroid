@@ -57,11 +57,11 @@ public class PlayerFragment extends Fragment {
     public void injectPlayer(Player player) {
         if (mainViewModel == null)
             throw new IllegalStateException("ViewModel must be injected first.");
-        if (player.color == Color.RED) {
+        if (player.color == Color.Red) {
             handlePlayerRedLiveData();
             checkerView.paintRed();
         }
-         else if (player.color == Color.BLUE) {
+         else if (player.color == Color.Blue) {
             handlePlayerBlueLiveData();
             checkerView.paintBlue();
          }
@@ -106,7 +106,11 @@ public class PlayerFragment extends Fragment {
                 if (checkerView.draggable && event.getAction() == MotionEvent.ACTION_DOWN) {
                     ClipData data = ClipData.newPlainText("", "");
                     View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(checkerView);
-                    checkerView.startDragAndDrop(data, shadowBuilder, checkerView, 0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        checkerView.startDragAndDrop(data, shadowBuilder, null, 0);
+                    } else {
+                        checkerView.startDrag(data, shadowBuilder, null, 0);
+                    }
                     return true;
                 } else {
                     return false;
@@ -165,7 +169,7 @@ public class PlayerFragment extends Fragment {
             playerText.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
             checkerView.draggable = false;
         }
-        playerText.setText(player.playerName);
+        playerText.setText(player.name);
         pointsText.setText("" + player.wins);
     }
 

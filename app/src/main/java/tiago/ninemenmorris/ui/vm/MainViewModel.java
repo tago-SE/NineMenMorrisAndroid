@@ -31,16 +31,12 @@ public class MainViewModel extends ViewModel {
 
     private Game game;
 
-
-
     public MainViewModel() {
         game = Game.getInstance();
         checkerLiveData.setValue(game.getCheckers());
         winnerLiveData.setValue(null);
 
     }
-
-    static boolean startOnceOnly = true;
 
     public void refresh() {
         postPlayerData(game.player1);
@@ -53,17 +49,6 @@ public class MainViewModel extends ViewModel {
         postBoardData(game.getCheckers());
         postPlayerData(game.player1);
         postPlayerData(game.player2);
-        //player0LiveData.postValue(game.player1);
-        //player1LiveData.postValue(game.player2);
-        //remainingRedLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player1));
-        //remainingBlueLiveData.postValue(game.getNumberOfUnplacedCheckers(game.player2));
-
-        //checkerLiveData.postValue(game.getCheckers());
-        /*
-
-        */
-        // Update current active player
-       // currentPlayerLiveData.postValue(game.getCurrentPlayer());
         winnerLiveData.setValue(null);
     }
 
@@ -115,7 +100,7 @@ public class MainViewModel extends ViewModel {
 
 
     private void postPlayerData(Player p) {
-        if (p.color == Color.RED){
+        if (p.color == Color.Red){
             remainingRedLiveData.postValue(game.getUnplacedCheckers(p.color));
         } else{
             remainingBlueLiveData.postValue(game.getUnplacedCheckers(p.color));
@@ -139,6 +124,10 @@ public class MainViewModel extends ViewModel {
 
     public Player getPlayerBlue() {
         return game.player2;
+    }
+
+    public Player getCurrentPlayer() {
+        return game.getCurrentPlayer();
     }
 
     public boolean isOccupied(Position p) {

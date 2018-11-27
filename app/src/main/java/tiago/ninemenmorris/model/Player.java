@@ -2,20 +2,20 @@ package tiago.ninemenmorris.model;
 
 public class Player {
 
-    public final String playerName;
-    public final Color color;
+    public String name;
+    public Color color;
     public int wins;
     public boolean activeTurn;
     private State state;
 
-    private static enum State {
+    private enum State {
         PLACING, REMOVING;
     }
 
     public Player(String playerName, Color color) {
-        this.playerName = playerName;
+        this.name = playerName;
         this.color = color;
-        wins = 0; // default
+        wins = 0;
         activeTurn = false;
         state = State.PLACING;
     }
@@ -39,7 +39,7 @@ public class Player {
     @Override
     public String toString() {
         return "Player{" +
-                "playerName='" + playerName + '\'' +
+                "playerName='" + name + '\'' +
                 ", color=" + color +
                 ", wins=" + wins +
                 ", activeTurn=" + activeTurn +

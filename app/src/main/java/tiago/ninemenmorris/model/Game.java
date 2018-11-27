@@ -13,10 +13,15 @@ public class Game {
     private Player curPlayer;
     private Board board;
     private boolean gameOver;
-
-    private static final int FLYING_REQ     = 3;
-    private static final int NUM_CHECKERS   = 9;
+    // Requirement for flying movement
+    private int flyingCondition             = 3;
+    // Number of starting checkers
+    private int loseCondition               = 2;
+    // Starting checkers
+    private int startingCheckers            = 9;
+    // Number of unplaced red checkers
     private int unplacedRed;
+    // Number of unplaced blue checkers
     private int unplacedBlue;
 
     public static Game getInstance() {
@@ -24,25 +29,39 @@ public class Game {
     }
 
     private Game() {
-        player1 = new Player("Player 1", Color.RED);
-        player2 = new Player("Player 2", Color.BLUE);
+        player1 = new Player("Player 1", Color.Red);
+        player2 = new Player("Player 2", Color.Blue);
+    }
+
+    public void setStartingCheckers(int startingCheckers) {
+        this.startingCheckers = startingCheckers;
+    }
+
+    public void setFlyingCondition(int flyingCondition) {
+        this.flyingCondition = flyingCondition;
+    }
+
+    public void setLoseCondition(int loseCondition) {
+        this.loseCondition = loseCondition;
     }
 
     public void start() {
         if ((int) (Math.random()*100) < 50) {
             curPlayer = player1;
             player1.activeTurn = true;
+            player2.activeTurn = false;
         }
         else {
             curPlayer = player2;
             player2.activeTurn = true;
+            player1.activeTurn = false;
         }
         board = new Board();
         gameOver = false;
         player1.setStatePlacing();
         player2.setStatePlacing();
-        unplacedBlue = NUM_CHECKERS;
-        unplacedRed = NUM_CHECKERS;
+        unplacedBlue = startingCheckers;
+        unplacedRed = startingCheckers;
     }
 
     public List<Checker> getCheckers() {
@@ -87,7 +106,7 @@ public class Game {
         // Prevent moving checkers if not in proper state
         if (!curPlayer.isInPlaceState())
             return null;
-        Checker checker = board.moveChecker(source, destination, getPlacedCheckers(curPlayer.color) <= FLYING_REQ);
+        Checker checker = board.moveChecker(source, destination, getPlacedCheckers(curPlayer.color) <= flyingCondition);
         if (checker == null)
             return null;
         if (!handleMatchingColors(destination, curPlayer.color)) {
@@ -105,7 +124,7 @@ public class Game {
         curPlayer.setStatePlacing();
         swapCurrentPlayer();
         // Check remaining for new curPlayer
-        if (board.countPlacedCheckersByColor(curPlayer.color) + getUnplacedCheckers(curPlayer.color) <= 2) {
+        if (board.countPlacedCheckersByColor(curPlayer.color) + getUnplacedCheckers(curPlayer.color) <= loseCondition) {
             gameOver = true;
             player1.activeTurn = player2.activeTurn = false;
             for (Checker c : board.getPlacedCheckers()) {
@@ -148,9 +167,9 @@ public class Game {
     }
 
     private void addUnplacedCheckers(Color c, int value) {
-        if (c == Color.RED)
+        if (c == Color.Red)
             unplacedRed += value;
-        else if (c == Color.BLUE)
+        else if (c == Color.Blue)
             unplacedBlue += value;
     }
 
@@ -164,9 +183,9 @@ public class Game {
     }
 
     public int getUnplacedCheckers(Color c) {
-        if (c == Color.RED)
+        if (c == Color.Red)
             return unplacedRed;
-        else if (c == Color.BLUE)
+        else if (c == Color.Blue)
             return unplacedBlue;
         return 0;
     }

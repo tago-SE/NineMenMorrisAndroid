@@ -1,10 +1,9 @@
 package tiago.ninemenmorris.ui;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
@@ -17,9 +16,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void startGame(View view) {
-        Game.getInstance().start();
-        Intent intent = new Intent(this, GameActivity.class);
+    public void newGame(View view) {
+        Intent intent = new Intent(this, GameSettingsActivity.class);
         startActivity(intent);
     }
 

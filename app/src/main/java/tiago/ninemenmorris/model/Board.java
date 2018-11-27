@@ -17,7 +17,7 @@ public class Board {
     public Board() {
         for (Position p : Position.values()) {
             if (p != Position.UNPLACED) {
-                Checker c = new Checker(p, Color.INVIS, false);
+                Checker c = new Checker(p, Color.Invis, false);
                 checkerPosMap.put(p, c);
             }
         }
@@ -46,7 +46,7 @@ public class Board {
     }
 
     public boolean isOccupied(Position p) {
-        return checkerPosMap.get(p).color != Color.INVIS;
+        return checkerPosMap.get(p).color != Color.Invis;
     }
 
     public List<Checker> checkers() {
@@ -63,7 +63,7 @@ public class Board {
 
     public Checker placeChecker(Position p, Color c) {
         Checker checker = checkerPosMap.get(p);
-        if (checker.color != Color.INVIS && c != Color.INVIS)
+        if (checker.color != Color.Invis && c != Color.Invis)
             return null;
         checker.color = c;
         placedCheckers.add(checker);
@@ -74,11 +74,11 @@ public class Board {
         Checker destChecker = checkerPosMap.get(destination);
         Checker sourceChecker = checkerPosMap.get(source);
         // Check for adjacent blabla ignore if flying
-        if ((sourceChecker.color == Color.INVIS && destChecker.color != Color.INVIS) ||
+        if ((sourceChecker.color == Color.Invis && destChecker.color != Color.Invis) ||
                 (!flying && !getAdjacent(source, HORIZONTAL).contains(destination) && !getAdjacent(source, VERTICAL).contains(destination)))
             return null;
         destChecker.color = sourceChecker.color;
-        sourceChecker.color = Color.INVIS;
+        sourceChecker.color = Color.Invis;
         placedCheckers.remove(sourceChecker);
         placedCheckers.add(destChecker);
         return destChecker;
@@ -95,10 +95,10 @@ public class Board {
 
     public Checker removeChecker(Position position, Color color) {
         Checker checker = checkerPosMap.get(position);
-        if (checker.color == Color.INVIS || checker.color == color)
+        if (checker.color == Color.Invis || checker.color == color)
             return null;
         placedCheckers.remove(checker);
-        checker.color = Color.INVIS;
+        checker.color = Color.Invis;
         return checker;
     }
 

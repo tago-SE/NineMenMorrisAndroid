@@ -9,7 +9,7 @@
     <string name="_5">5</string>
     <string name="_9">9</string>
     <string name="todo">TODO</string>
-    <string name="play">Play</string>
+    <string name="play">New Game</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -23,5 +23,13 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="load">Load</string>
+    <string name="load">Load Game</string>
+    <string name="restart">Restart</string>
+    <string name="back">Back</string>
+    <string name="player_1">Player 1:</string>
+    <string name="player_2">Player 2:</string>
+    <string name="player_names">Player Names</string>
+    <string name="game_settings">Game Settings</string>
+
+
 </resources>
