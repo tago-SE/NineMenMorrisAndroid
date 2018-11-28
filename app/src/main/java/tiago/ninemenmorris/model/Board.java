@@ -14,7 +14,6 @@ public class Board {
     public static final String HORIZONTAL   = "H";
     public static final String VERTICAL     = "V";
 
-
     public Board() {
         for (Position p : Position.values()) {
             if (p != Position.UNPLACED) {
@@ -22,7 +21,17 @@ public class Board {
                 checkerPosMap.put(p, c);
             }
         }
+        setupBoardMap();
+    }
 
+    public Board(List<Checker> checkers) {
+        for (Checker c : checkers) {
+            checkerPosMap.put(c.position, c);
+        }
+        setupBoardMap();
+    }
+
+    private static void setupBoardMap() {
         // Maps vertical and horizontal mills
         if (millMap == null) {
             millMap = new Hashtable<>();
