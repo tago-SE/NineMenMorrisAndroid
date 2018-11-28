@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tiago.ninemenmorris.DAO.CheckerDAO;
@@ -13,6 +14,7 @@ import tiago.ninemenmorris.DAO.PlayerDAO;
 import tiago.ninemenmorris.model.Checker;
 import tiago.ninemenmorris.model.Color;
 import tiago.ninemenmorris.model.Game;
+import tiago.ninemenmorris.model.GameMetaData;
 import tiago.ninemenmorris.model.Player;
 
 @Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 1, exportSchema = false)
@@ -41,7 +43,15 @@ public abstract class DBHandler extends RoomDatabase {
     //get instance of database
     public static DBHandler getInstance() { return dbHandler; }
 
-
+    /** TODO: Finish **/
+    public List<GameMetaData> getAllGamesMetaData() {
+        List<GameMetaData> list = new ArrayList<>();
+        // Fetch all games
+        // loop through the games and add relevant information to the list.
+        // id, timestamp, playername 1, playername 2.
+        list.add(new GameMetaData());
+        return list;
+    }
 
     //method for saving into the database
     public void save(Game game) {
