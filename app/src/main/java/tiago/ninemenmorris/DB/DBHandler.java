@@ -90,11 +90,16 @@ public abstract class DBHandler extends RoomDatabase {
         Log.w(TAG, "insertGame()");
     }
 
+    /**
+     * Fetches a list containing meta-data of all game sessions that have yet finished
+     * @return List
+     */
     public List<GameMetaData> getAllGamesMetaData() {
         List<GameMetaData> list = new ArrayList<>();
         GameDAO dao = gameDAO();
         for (GameEntity ge : dao.getAllGames()) {
-            list.add(new GameMetaData(ge.id, ge.player1, ge.player2, ge.timestamp));
+            if (!ge.gameOver)
+                list.add(new GameMetaData(ge.id, ge.player1, ge.player2, ge.timestamp));
         }
         return list;
     }

@@ -10,16 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import tiago.ninemenmorris.DB.DBHandler;
-import tiago.ninemenmorris.DB.ExampleLoadCode;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
 import tiago.ninemenmorris.model.GameMetaData;
@@ -38,7 +35,10 @@ public class LoadActivity extends AppCompatActivity {
         (new AsynkTask()).execute();
     }
 
+
     /**
+     * AsynkTask that fetches a list of uncompleted game sessions and adds them to the
+     * RecycleView.
      */
     private class AsynkTask extends AsyncTask<Void, Void, List<GameMetaData>> {
         @Override
