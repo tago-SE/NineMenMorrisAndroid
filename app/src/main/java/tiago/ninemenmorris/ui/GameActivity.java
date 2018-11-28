@@ -114,7 +114,7 @@ public class GameActivity extends AppCompatActivity {
                 return true;
             case R.id.loadgame:
                 // Load Game Activity
-                Log.e(TAG, "Load - not yet implemented");
+                startActivity(new Intent(this, LoadActivity.class));
                 return true;
             case R.id.gamepref:
                 startActivity(new Intent(this, SettingsActivity.class));

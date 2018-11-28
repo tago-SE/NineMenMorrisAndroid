@@ -198,4 +198,5 @@ public class Game {
             return unplacedBlue;
         return 0;
     }
+
 }

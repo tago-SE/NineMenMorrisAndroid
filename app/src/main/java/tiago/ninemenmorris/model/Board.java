@@ -79,10 +79,18 @@ public class Board {
         return checkerPosMap.get(p).color != Color.Invis;
     }
 
+    /**
+     * Returns a collection of all checkers, colored if placed and invisible if not.
+     * @return
+     */
     public List<Checker> checkers() {
         return new ArrayList(checkerPosMap.values());
     }
 
+    /**
+     * Returns a collection of all placed checkers.
+     * @return
+     */
     public Collection<Checker> getPlacedCheckers() {
         return placedCheckers;
     }
