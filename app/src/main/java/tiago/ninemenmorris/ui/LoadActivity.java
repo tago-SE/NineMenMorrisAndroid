@@ -2,6 +2,7 @@ package tiago.ninemenmorris.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import tiago.ninemenmorris.DB.DBHandler;
 import tiago.ninemenmorris.DB.ExampleLoadCode;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
@@ -26,22 +28,31 @@ public class LoadActivity extends AppCompatActivity {
 
     private static final String TAG = "Load";
 
+    public final Context context = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
-        RecyclerView recyclerView = findViewById(R.id.loadRecycleView);
+        // Fetches Game meta-data from the database and updates the recycle view
+        (new AsynkTask()).execute();
+    }
 
-        // Change this
-        ExampleLoadCode example = new ExampleLoadCode();
-        List<GameMetaData> list = (List<GameMetaData>) example.getGames();
-        Log.w(TAG, list.toString());
+    /**
+     */
+    private class AsynkTask extends AsyncTask<Void, Void, List<GameMetaData>> {
+        @Override
+        protected List<GameMetaData> doInBackground(Void... voids) {
+            return DBHandler.getInstance().getAllGamesMetaData();
+        }
 
-        // Publishing the adapter
-        recyclerView.hasFixedSize();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new GameAdapter(list, this));
-
+        @Override
+        protected void onPostExecute(List<GameMetaData> result) {
+            RecyclerView recyclerView = findViewById(R.id.loadRecycleView);
+            recyclerView.hasFixedSize();
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new GameAdapter(result, context));
+        }
     }
 
     private class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
@@ -93,9 +104,11 @@ public class LoadActivity extends AppCompatActivity {
                 GameMetaData data = items.get(getAdapterPosition());
                 Log.d(TAG, "onClick: " + data.toString());
 
+                /* TODO: Query for the id of the selected game and set it up */
                 // Replace start with load here
                 int gameId = data.getId();
                 Game.getInstance().start();
+
                 // Start next activity
                 Intent intent = new Intent(contex, GameActivity.class);
                 startActivity(intent);

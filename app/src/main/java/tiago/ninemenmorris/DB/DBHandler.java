@@ -4,8 +4,10 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tiago.ninemenmorris.DAO.CheckerDAO;
@@ -17,8 +19,10 @@ import tiago.ninemenmorris.model.Game;
 import tiago.ninemenmorris.model.GameMetaData;
 import tiago.ninemenmorris.model.Player;
 
-@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 4, exportSchema = false)
 public abstract class DBHandler extends RoomDatabase {
+
+    private static final String TAG = "DBHandler";
 
     public abstract GameDAO gameDAO();
     public abstract PlayerDAO playerDAO();
@@ -26,28 +30,72 @@ public abstract class DBHandler extends RoomDatabase {
 
     private static volatile DBHandler dbHandler;
 
-    //create database
+    /**
+     * Factory method
+     * @param context
+     * @return
+     */
     public static DBHandler buildInstance (final Context context){
         if (dbHandler == null){
             synchronized (DBHandler.class){
                 if (dbHandler == null){
-                    dbHandler = Room.databaseBuilder(context.getApplicationContext(), DBHandler.class, "ninemenmorris_db").build();
+                    dbHandler = Room.databaseBuilder(context.getApplicationContext(), DBHandler.class, "ninemenmorris_db").fallbackToDestructiveMigration().build();
                 }
             }
         }
         return dbHandler;
     }
 
-    //get instance of database
+    /**
+     * Access method
+     * @return
+     */
     public static DBHandler getInstance() { return dbHandler; }
 
-    /** TODO: Finish **/
+
+    private void insertCheckers(List<Checker> checkers, int gameId) {
+        CheckerDAO dao = checkerDAO();
+        for (Checker c : checkers) {
+            CheckerEntity ce = new CheckerEntity(
+                    c.getColor().toString(),
+                    c.isDraggable(),
+                    c.getPosition().toString(),
+                    gameId
+            );
+            dao.insertChecker(ce);
+        }
+    }
+
+    public void insertGame(Game game) {
+        GameEntity ge = new GameEntity();
+        ge.gameOver = game.isGameOver();
+        ge.flyingCondition = game.getFlyingCondition();
+        ge.loseCondition = game.getLoseCondition();
+        ge.timestamp = (new Date()).toString();
+        ge.player1 = game.player1.name;
+        ge.playerColor1 = game.player1.color.toString();
+        ge.playerState1 = game.player1.getState().toString();
+        ge.unplaced1 = game.getUnplacedRed();
+        ge.player2 = game.player2.name;
+        ge.playerColor2 = game.player2.color.toString();
+        ge.playerState2 = game.player2.getState().toString();
+        ge.unplaced2 = game.getUnplacedBlue();
+        if (game.getCurrentPlayer().equals(game.player1))
+            ge.playerTurn = 1;
+        else
+            ge.playerTurn = 2;
+        int id = (int) gameDAO().insertGame(ge);
+        game.setId(id);
+        insertCheckers(game.getCheckers(), id);
+        Log.w(TAG, "insertGame()");
+    }
+
     public List<GameMetaData> getAllGamesMetaData() {
         List<GameMetaData> list = new ArrayList<>();
-        // Fetch all games
-        // loop through the games and add relevant information to the list.
-        // id, timestamp, playername 1, playername 2.
-        list.add(new GameMetaData());
+        GameDAO dao = gameDAO();
+        for (GameEntity ge : dao.getAllGames()) {
+            list.add(new GameMetaData(ge.id, ge.player1, ge.player2, ge.timestamp));
+        }
         return list;
     }
 
@@ -92,7 +140,7 @@ public abstract class DBHandler extends RoomDatabase {
 
         try {
             theGame = dbHandler.gameDAO().getGameById(game.getId());
-            game.setGameId(theGame.get(0).id);
+            game.setId(theGame.get(0).id);
             game.setGameOver(theGame.get(0).gameOver);
 
             thePlayers = dbHandler.playerDAO().getPlayersByGameId(game.getId());

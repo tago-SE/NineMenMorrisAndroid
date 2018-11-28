@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Setup default game configuration based on preferences
-        Game game = Game.getInstance();
-        DBHandler databaseHandler = DBHandler.buildInstance(this);
+        final Game game = Game.getInstance();
+        final DBHandler db = DBHandler.buildInstance(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
@@ -32,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
         game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
         game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
 
+
         Game.getInstance().start();
+
         // Start next activity
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);

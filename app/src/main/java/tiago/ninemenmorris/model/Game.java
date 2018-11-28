@@ -42,7 +42,7 @@ public class Game {
         this.startingCheckers = startingCheckers;
     }
 
-    public void setGameId(int id){ this.id = id; }
+    public void setId(int id){ this.id = id; }
     public void setGameOver(boolean gameOver){ this.gameOver = gameOver; }
     public int getId() { return id;}
 
@@ -56,6 +56,30 @@ public class Game {
 
     public Checker getLastRemovedChecker() {
         return lastRemovedChecker;
+    }
+
+    public int getFlyingCondition() {
+        return flyingCondition;
+    }
+
+    public int getLoseCondition() {
+        return loseCondition;
+    }
+
+    public int getUnplacedRed() {
+        return unplacedRed;
+    }
+
+    public void setUnplacedRed(int unplacedRed) {
+        this.unplacedRed = unplacedRed;
+    }
+
+    public int getUnplacedBlue() {
+        return unplacedBlue;
+    }
+
+    public void setUnplacedBlue(int unplacedBlue) {
+        this.unplacedBlue = unplacedBlue;
     }
 
     public void start() {
@@ -75,8 +99,13 @@ public class Game {
         player2.setStatePlacing();
         unplacedBlue = startingCheckers;
         unplacedRed = startingCheckers;
-
-
+        // Saves the started game in the database
+        (new Thread() {
+            @Override
+            public void run(){
+                DBHandler.getInstance().insertGame(Game.getInstance());
+            }
+        }).start();
     }
 
     public List<Checker> getCheckers() {
@@ -209,7 +238,7 @@ public class Game {
     }
 
     public void saveGame() throws Exception {
-        DBHandler.getInstance().save(this);
+        //DBHandler.getInstance().save(this);
     }
 
 }

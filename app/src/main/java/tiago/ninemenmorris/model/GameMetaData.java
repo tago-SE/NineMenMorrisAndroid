@@ -10,9 +10,6 @@ public class GameMetaData {
     private String player2;
     private String timestamp;
 
-    @Deprecated // Temporary
-    private static int counter = 0;
-
     @Deprecated
     public GameMetaData() {
         // Remove
@@ -20,7 +17,7 @@ public class GameMetaData {
         timestamp = date.toString();
         player1 = "Tiago";
         player2 = "Ahmed";
-        id = ++counter;
+        id = 0;
     }
 
     public GameMetaData(int id, String player1, String player2, String timestamp) {

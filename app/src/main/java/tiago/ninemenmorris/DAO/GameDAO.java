@@ -13,7 +13,7 @@ import tiago.ninemenmorris.DB.GameEntity;
 public interface GameDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertGame(GameEntity... gameEntities);
+    long insertGame(GameEntity entity);
 
     @Query("SELECT * FROM gameEntities")
     List<GameEntity> getAllGames();
