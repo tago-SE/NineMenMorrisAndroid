@@ -28,7 +28,6 @@ public abstract class DBHandler extends RoomDatabase {
 
     //create database
     public static DBHandler buildInstance (final Context context){
-
         if (dbHandler == null){
             synchronized (DBHandler.class){
                 if (dbHandler == null){
@@ -36,7 +35,6 @@ public abstract class DBHandler extends RoomDatabase {
                 }
             }
         }
-
         return dbHandler;
     }
 
