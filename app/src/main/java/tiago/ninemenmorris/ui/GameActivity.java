@@ -91,6 +91,44 @@ public class GameActivity extends AppCompatActivity {
         handleObservedWinner();
     }
 
+    /*
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Thread saveGameThread = new Thread(){
+
+            @Override
+            public void run(){
+                mainViewModel.saveGame();
+                Log.e(TAG, "IN THREAD");
+            }
+        };
+
+        saveGameThread.start();
+
+        Log.e(TAG, "THREAD FINISHED");
+    }*/
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+
+        Thread saveGameThread = new Thread(){
+
+            @Override
+            public void run(){
+                mainViewModel.saveGame();
+                Log.e(TAG, "IN THREAD");
+            }
+        };
+
+        saveGameThread.start();
+
+        Log.e(TAG, "THREAD FINISHED");
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);

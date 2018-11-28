@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import tiago.ninemenmorris.DB.DBHandler;
+
 public class Game {
 
     private static final Game ourInstance = new Game();
-    public int id;
+    private int id;
     public final Player player1;
     public final Player player2;
     private Player curPlayer;
@@ -39,6 +41,10 @@ public class Game {
     public void setStartingCheckers(int startingCheckers) {
         this.startingCheckers = startingCheckers;
     }
+
+    public void setGameId(int id){ this.id = id; }
+    public void setGameOver(boolean gameOver){ this.gameOver = gameOver; }
+    public int getId() { return id;}
 
     public void setFlyingCondition(int flyingCondition) {
         this.flyingCondition = flyingCondition;
@@ -158,6 +164,9 @@ public class Game {
     public Player getCurrentPlayer() {
         return curPlayer;
     }
+    public void setCurrentPlayer(Player p){
+        curPlayer = p;
+    }
 
     private void swapCurrentPlayer() {
         if (curPlayer.equals(player1)) {
@@ -197,6 +206,10 @@ public class Game {
         else if (c == Color.Blue)
             return unplacedBlue;
         return 0;
+    }
+
+    public void saveGame() throws Exception {
+        DBHandler.getInstance().save(this);
     }
 
 }

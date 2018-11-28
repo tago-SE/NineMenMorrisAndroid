@@ -8,7 +8,7 @@ public class Player {
     public boolean activeTurn;
     private State state;
 
-    private enum State {
+    public enum State {
         PLACING, REMOVING;
     }
 
@@ -28,6 +28,8 @@ public class Player {
         state = State.REMOVING;
     }
 
+    public void setState(State state){this.state = state; }
+
     public boolean isInRemoveState() {
         return state == State.REMOVING;
     }
@@ -35,6 +37,9 @@ public class Player {
     public boolean isInPlaceState() {
         return state == State.PLACING;
     }
+
+    public State getState(){ return state; }
+    public String getStateString() { return state.toString(); }
 
     @Override
     public String toString() {

@@ -53,6 +53,14 @@ public class MainViewModel extends ViewModel {
         winnerLiveData.setValue(null);
     }
 
+    public void saveGame(){
+        try {
+            game.saveGame();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean select(Position source, Position destination) {
         if (source == null) {
             return placeChecker(destination);

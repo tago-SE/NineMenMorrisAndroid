@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import tiago.ninemenmorris.DB.DBHandler;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
 
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // Setup default game configuration based on preferences
         Game game = Game.getInstance();
+        DBHandler databaseHandler = DBHandler.buildInstance(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
