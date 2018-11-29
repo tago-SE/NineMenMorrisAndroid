@@ -28,18 +28,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Setup default game configuration based on preferences
-        final Game game = Game.getInstance();
-        final DBHandler db = DBHandler.buildInstance(this);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
-        game.player2.name = prefs.getString("prefPlayer2name", "Player 2");
-
-        game.setLoseCondition(Integer.parseInt(prefs.getString("victory_cond", "2")));
-        game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
-        game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
-
+        // Configures the database
+        DBHandler.buildInstance(this);
         // Starts a new game or the last saved session
         (new Start()).execute();
     }
@@ -61,7 +51,15 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // No previous session was retored and a new one is created
                 Log.w(TAG, "New session was created");
-                Game.getInstance().start();
+
+                Game game = Game.getInstance();
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
+                game.player2.name = prefs.getString("prefPlayer2name", "Player 2");
+                game.setLoseCondition(Integer.parseInt(prefs.getString("victory_cond", "2")));
+                game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
+                game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
+                game.start();
             }
             Intent intent = new Intent(context, GameActivity.class);
             startActivity(intent);
