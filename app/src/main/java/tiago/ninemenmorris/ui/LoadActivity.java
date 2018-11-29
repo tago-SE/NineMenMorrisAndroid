@@ -95,6 +95,8 @@ public class LoadActivity extends AppCompatActivity {
             recyclerView.hasFixedSize();
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(new GameAdapter(new ArrayList<GameMetaData>(), context));
+            // Starts a new game instance
+            Game.getInstance().start();
         }
     }
 
