@@ -7,6 +7,7 @@ public class Player {
     public int wins;
     public boolean activeTurn;
     private State state;
+    private int remaining;
 
     public enum State {
         PLACING, REMOVING;
@@ -40,6 +41,14 @@ public class Player {
 
     public State getState(){ return state; }
     public String getStateString() { return state.toString(); }
+
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(int remaining) {
+        this.remaining = remaining;
+    }
 
     @Override
     public String toString() {

@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Color;
+import tiago.ninemenmorris.model.Game;
 import tiago.ninemenmorris.model.Player;
 import tiago.ninemenmorris.model.Position;
 import tiago.ninemenmorris.ui.vm.MainViewModel;
@@ -38,6 +39,9 @@ public class PlayerFragment extends Fragment {
 
     // size of checker relative to screen dimension
     private static final double checkerFactor = 1./8.;
+
+    //
+    Game game = Game.getInstance();
 
     private MainViewModel mainViewModel;
     private CheckerView checkerView;
@@ -152,7 +156,7 @@ public class PlayerFragment extends Fragment {
     }
 
     private void updateRemaining(int remaining) {
-        lastRemaining = remaining;
+        lastRemaining = game.getUnplacedCheckers(game.getCurrentPlayer().color);
         remainingText.setText("" + remaining);
     }
 
@@ -161,7 +165,7 @@ public class PlayerFragment extends Fragment {
             return;
         if (player.activeTurn) {
             playerText.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-            if (lastRemaining != 0)
+            if (game.getUnplacedCheckers(game.getCurrentPlayer().color) != 0)
                 checkerView.draggable = true;
             if (player.isInRemoveState())
                 checkerView.draggable = false;
