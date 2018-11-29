@@ -66,6 +66,7 @@ public abstract class DBHandler extends RoomDatabase {
 
     private void insertCheckers(List<Checker> checkers, int gameId) {
         CheckerDAO dao = checkerDAO();
+        dao.deleteCheckersByGameId(gameId);
         for (Checker c : checkers) {
             CheckerEntity ce = new CheckerEntity(
                     c.getColor().toString(),

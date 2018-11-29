@@ -1,5 +1,7 @@
 package tiago.ninemenmorris.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -26,6 +28,7 @@ public class Board {
     }
 
     public Board(List<Checker> checkers) {
+        Log.w("Board", checkers.toString() + "\n");
         for (Checker c : checkers) {
             checkerPosMap.put(c.position, c);
             if (c.color != Color.Invis)

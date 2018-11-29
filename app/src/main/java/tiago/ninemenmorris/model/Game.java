@@ -169,6 +169,7 @@ public class Game {
         // Prevent moving checkers if not in proper state
         if (!curPlayer.isInPlaceState())
             return null;
+        Log.w(TAG, "placed checkers " + curPlayer.color + ": " + getPlacedCheckers(curPlayer.color) + " <= " + flyingCondition);
         Checker checker = board.moveChecker(source, destination, getPlacedCheckers(curPlayer.color) <= flyingCondition);
         if (checker == null)
             return null;
@@ -264,8 +265,10 @@ public class Game {
     public int getPlacedCheckers(Color color) {
         int counter = 0;
         for (Checker c : board.getPlacedCheckers()) {
-            if (c.color == color)
+            if (c.color == color) {
+                Log.w(TAG, c.toString());
                 counter++;
+            }
         }
         return counter;
     }
