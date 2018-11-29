@@ -111,6 +111,7 @@ public class Game {
         unplacedBlue = startingCheckers;
         unplacedRed = startingCheckers;
         id = 0;
+        setupDragability();
         saveGameState();
     }
 
@@ -142,10 +143,6 @@ public class Game {
         }
         if (returnValue) {
             curPlayer.setStateRemoving();
-            /*
-            for (Checker checker : board.getPlacedCheckers())
-                checker.draggable = false;
-            */
         }
         setupDragability();
         return returnValue;
@@ -255,12 +252,6 @@ public class Game {
             player1.activeTurn = true;
         }
         player2.activeTurn = !player1.activeTurn;
-        /*
-        for (Checker c : board.getPlacedCheckers()) {
-            // Conditions for making placed checkers draggable
-            c.draggable = curPlayer.color == c.color && getUnplacedCheckers(curPlayer.color) == 0;
-        }
-        */
     }
 
     private void addUnplacedCheckers(Color c, int value) {
