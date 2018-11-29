@@ -45,10 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if (result) {
-                // The last session was not complete and is restored
-                Log.w(TAG, "Last session was restored");
-            } else {
+            if (!result) {
+
                 // No previous session was retored and a new one is created
                 Log.w(TAG, "New session was created");
 
@@ -60,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
                 game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
                 game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
                 game.start();
+
+                Log.e(TAG, "SESSION LOADED SUCCESSFULLY");
+                //DBHandler.getInstance().loadGame(Game.getId());
+                // The last session was not complete and is restored
+                Log.w(TAG, "Last session was restored");
             }
             Intent intent = new Intent(context, GameActivity.class);
             startActivity(intent);

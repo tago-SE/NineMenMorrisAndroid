@@ -12,6 +12,7 @@ import java.util.List;
 
 import tiago.ninemenmorris.DAO.CheckerDAO;
 import tiago.ninemenmorris.DAO.GameDAO;
+import tiago.ninemenmorris.DAO.LatestSavedGameDAO;
 import tiago.ninemenmorris.DAO.PlayerDAO;
 import tiago.ninemenmorris.model.Checker;
 import tiago.ninemenmorris.model.Color;
@@ -20,7 +21,7 @@ import tiago.ninemenmorris.model.GameMetaData;
 import tiago.ninemenmorris.model.Player;
 import tiago.ninemenmorris.model.Position;
 
-@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 5, exportSchema = false)
+@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class, LatestSavedGameEntity.class}, version = 5, exportSchema = false)
 public abstract class DBHandler extends RoomDatabase {
 
     private static final String TAG = "DBHandler";
@@ -28,6 +29,7 @@ public abstract class DBHandler extends RoomDatabase {
     public abstract GameDAO gameDAO();
     public abstract PlayerDAO playerDAO();
     public abstract CheckerDAO checkerDAO();
+    public abstract LatestSavedGameDAO latestSavedGameDAO();
 
     private static volatile DBHandler dbHandler;
 
@@ -154,7 +156,11 @@ public abstract class DBHandler extends RoomDatabase {
         } else {
             game.setCurrentPlayer(game.player2);
         }
+
         /* TODO: Save game id as last played */
+        latestSavedGameDAO().deleteAllSavedGames();
+        latestSavedGameDAO().insertLatestSavedGame(new LatestSavedGameEntity(game.getId()));
+
         return true;
     }
 
@@ -162,7 +168,12 @@ public abstract class DBHandler extends RoomDatabase {
      * Loads the last saved session if it's unfinished
      */
     public boolean loadLastSavedGameState() {
-        int id = -1; /* TODO Load last id */
+        List<LatestSavedGameEntity> latestSavedGame = latestSavedGameDAO().getSavedGame(); /* TODO Load last id */
+        if (latestSavedGame.size() != 1 || latestSavedGame == null){
+            return false;
+        }
+        //Game game = Game.getInstance();
+        int id = latestSavedGame.get(0).gameId;
        return loadGame(id);
     }
 

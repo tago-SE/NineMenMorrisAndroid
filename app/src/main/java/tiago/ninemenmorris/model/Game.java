@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import tiago.ninemenmorris.DB.DBHandler;
+import tiago.ninemenmorris.DB.LatestSavedGameEntity;
 
 public class Game {
 
@@ -107,12 +108,13 @@ public class Game {
         saveGameState();
     }
 
-    private void saveGameState() {
+    public void saveGameState() {
         // Saves the started game in the database
         (new Thread() {
             @Override
             public void run(){
                 DBHandler.getInstance().insertGame();
+                DBHandler.getInstance().latestSavedGameDAO().insertLatestSavedGame(new LatestSavedGameEntity(Game.getInstance().getId()));
             }
         }).start();
     }
@@ -151,7 +153,7 @@ public class Game {
         if (!handleMatchingColors(position, curPlayer.color)) {
             swapCurrentPlayer();
         }
-        saveGameState();
+        //saveGameState();
         return board.checkers();
     }
 
@@ -166,7 +168,7 @@ public class Game {
         if (!handleMatchingColors(destination, curPlayer.color)) {
             swapCurrentPlayer();
         }
-        saveGameState();
+        //saveGameState();
         return board.checkers();
     }
 
@@ -186,7 +188,7 @@ public class Game {
                 c.draggable = false;
             }
         }
-        saveGameState();
+        //saveGameState();
         return board.checkers();
     }
 
