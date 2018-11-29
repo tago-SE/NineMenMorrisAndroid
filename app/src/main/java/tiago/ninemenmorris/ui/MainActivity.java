@@ -1,20 +1,28 @@
 package tiago.ninemenmorris.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+
+import java.util.ArrayList;
 
 import tiago.ninemenmorris.DB.DBHandler;
 import tiago.ninemenmorris.R;
 import tiago.ninemenmorris.model.Game;
+import tiago.ninemenmorris.model.GameMetaData;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
+    private final Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,21 +40,34 @@ public class MainActivity extends AppCompatActivity {
         game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
         game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
 
+        // Starts a new game or the last saved session
+        (new Start()).execute();
+    }
 
-        Game.getInstance().start();
+    /**
+     * Starts a new game or the last saved game if unfinished
+     */
+    private class Start extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return DBHandler.getInstance().loadLastSavedGameState();
+        }
 
-        // Start next activity
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
-        finish();   // prevents the stack from returning to MainActivity
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                // The last session was not complete and is restored
+                Log.w(TAG, "Last session was restored");
+            } else {
+                // No previous session was retored and a new one is created
+                Log.w(TAG, "New session was created");
+                Game.getInstance().start();
+            }
+            Intent intent = new Intent(context, GameActivity.class);
+            startActivity(intent);
+            finish();   // prevents the stack from returning to MainActivity
+        }
     }
 
 
-    public void newGame(View view) {
-        Log.e(TAG, "Not implemented.");
-    }
-
-    public void loadGame(View view) {
-        Log.e(TAG, "Not implemented.");
-    }
 }

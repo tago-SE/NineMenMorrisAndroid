@@ -15,18 +15,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <Button
-            android:id="@+id/playButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="newGame"
-            android:text="@string/play" />
-        <Button
-            android:id="@+id/loadButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/load" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

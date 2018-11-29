@@ -127,6 +127,8 @@ public abstract class DBHandler extends RoomDatabase {
         Game game = Game.getInstance();
         GameDAO dao = gameDAO();
         GameEntity ge = dao.getGameById(id);
+        if (ge == null)
+            return false;
         if (ge.gameOver)
             return false;
         List<Checker> checkers = getCheckers(id);
@@ -160,7 +162,7 @@ public abstract class DBHandler extends RoomDatabase {
      * Loads the last saved session if it's unfinished
      */
     public boolean loadLastSavedGameState() {
-        int id = 0; /* TODO Load last id */
+        int id = -1; /* TODO Load last id */
        return loadGame(id);
     }
 
