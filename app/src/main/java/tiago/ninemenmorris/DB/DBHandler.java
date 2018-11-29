@@ -21,7 +21,7 @@ import tiago.ninemenmorris.model.GameMetaData;
 import tiago.ninemenmorris.model.Player;
 import tiago.ninemenmorris.model.Position;
 
-@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class, LatestSavedGameEntity.class}, version = 5, exportSchema = false)
+@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class, LatestSavedGameEntity.class}, version = 6, exportSchema = false)
 public abstract class DBHandler extends RoomDatabase {
 
     private static final String TAG = "DBHandler";
@@ -117,6 +117,7 @@ public abstract class DBHandler extends RoomDatabase {
         int id = (int) gameDAO().insertGame(ge);
         game.setId(id);
         insertCheckers(game.getCheckers(), id);
+        saveId(game.getId());
         return true;
     }
 
@@ -156,20 +157,21 @@ public abstract class DBHandler extends RoomDatabase {
         } else {
             game.setCurrentPlayer(game.player2);
         }
-
-        /* TODO: Save game id as last played */
-        latestSavedGameDAO().deleteAllSavedGames();
-        latestSavedGameDAO().insertLatestSavedGame(new LatestSavedGameEntity(game.getId()));
-
+        saveId(game.getId());
         return true;
+    }
+
+    public void saveId(int id) {
+        latestSavedGameDAO().deleteAllSavedGames();
+        latestSavedGameDAO().insertLatestSavedGame(new LatestSavedGameEntity(id));
     }
 
     /**
      * Loads the last saved session if it's unfinished
      */
     public boolean loadLastSavedGameState() {
-        List<LatestSavedGameEntity> latestSavedGame = latestSavedGameDAO().getSavedGame(); /* TODO Load last id */
-        if (latestSavedGame.size() != 1 || latestSavedGame == null){
+        List<LatestSavedGameEntity> latestSavedGame = latestSavedGameDAO().getSavedGame();
+        if (latestSavedGame == null || latestSavedGame.size() != 1){
             return false;
         }
         //Game game = Game.getInstance();

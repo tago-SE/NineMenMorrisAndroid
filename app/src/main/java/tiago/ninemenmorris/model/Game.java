@@ -1,5 +1,7 @@
 package tiago.ninemenmorris.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +11,10 @@ import tiago.ninemenmorris.DB.LatestSavedGameEntity;
 
 public class Game {
 
+    private static final String TAG = "Game";
+
     private static final Game ourInstance = new Game();
+
     private int id;
     public final Player player1;
     public final Player player2;
@@ -52,6 +57,7 @@ public class Game {
     }
 
     public void setLoseCondition(int loseCondition) {
+        Log.e(TAG, "lose condition set: " + loseCondition);
         this.loseCondition = loseCondition;
     }
 
@@ -136,9 +142,12 @@ public class Game {
         }
         if (returnValue) {
             curPlayer.setStateRemoving();
+            /*
             for (Checker checker : board.getPlacedCheckers())
                 checker.draggable = false;
+            */
         }
+        setupDragability();
         return returnValue;
     }
 
@@ -153,6 +162,7 @@ public class Game {
         if (!handleMatchingColors(position, curPlayer.color)) {
             swapCurrentPlayer();
         }
+        setupDragability();
         //saveGameState();
         return board.checkers();
     }
@@ -168,6 +178,7 @@ public class Game {
         if (!handleMatchingColors(destination, curPlayer.color)) {
             swapCurrentPlayer();
         }
+        setupDragability();
         //saveGameState();
         return board.checkers();
     }
@@ -184,10 +195,8 @@ public class Game {
         if (board.countPlacedCheckersByColor(curPlayer.color) + getUnplacedCheckers(curPlayer.color) <= loseCondition) {
             gameOver = true;
             player1.activeTurn = player2.activeTurn = false;
-            for (Checker c : board.getPlacedCheckers()) {
-                c.draggable = false;
-            }
         }
+        setupDragability();
         //saveGameState();
         return board.checkers();
     }
@@ -207,6 +216,7 @@ public class Game {
     public Player getCurrentPlayer() {
         return curPlayer;
     }
+
     public void setCurrentPlayer(Player p){
         curPlayer = p;
         if (curPlayer.equals(player1)) {
@@ -216,9 +226,22 @@ public class Game {
             player1.activeTurn = false;
             player2.activeTurn = true;
         }
+        setupDragability();
+    }
+
+    public void setupDragability() {
+        for (Checker c : board.checkers()) {
+            c.draggable = false;
+        }
+        if (gameOver)
+            return;
         for (Checker c : board.getPlacedCheckers()) {
-            // Conditions for making placed checkers draggable
-            c.draggable = curPlayer.color == c.color && getUnplacedCheckers(curPlayer.color) == 0;
+            if (curPlayer.color == c.getColor()) {
+                if (getUnplacedCheckers(curPlayer.color) == 0 && !curPlayer.isInRemoveState())
+                    c.draggable = true;
+                else
+                    c.draggable = false;
+            }
         }
     }
 
@@ -232,10 +255,12 @@ public class Game {
             player1.activeTurn = true;
         }
         player2.activeTurn = !player1.activeTurn;
+        /*
         for (Checker c : board.getPlacedCheckers()) {
             // Conditions for making placed checkers draggable
             c.draggable = curPlayer.color == c.color && getUnplacedCheckers(curPlayer.color) == 0;
         }
+        */
     }
 
     private void addUnplacedCheckers(Color c, int value) {
@@ -262,9 +287,6 @@ public class Game {
         return 0;
     }
 
-    public void saveGame() throws Exception {
-        //DBHandler.getInstance().save(this);
-    }
 
     @Override
     public String toString() {

@@ -46,10 +46,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             if (!result) {
-
                 // No previous session was retored and a new one is created
                 Log.w(TAG, "New session was created");
-
                 Game game = Game.getInstance();
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 game.player1.name = prefs.getString("prefPlayer1name", "Player 1");
@@ -58,10 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 game.setFlyingCondition(Integer.parseInt(prefs.getString("flying_cond", "3")));
                 game.setStartingCheckers(Integer.parseInt(prefs.getString("unplaced_checkers", "9")));
                 game.start();
-
-                Log.e(TAG, "SESSION LOADED SUCCESSFULLY");
-                //DBHandler.getInstance().loadGame(Game.getId());
-                // The last session was not complete and is restored
+            } else {
                 Log.w(TAG, "Last session was restored");
             }
             Intent intent = new Intent(context, GameActivity.class);

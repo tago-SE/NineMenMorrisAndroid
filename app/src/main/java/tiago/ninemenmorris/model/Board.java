@@ -19,6 +19,7 @@ public class Board {
             if (p != Position.UNPLACED) {
                 Checker c = new Checker(p, Color.Invis, false);
                 checkerPosMap.put(p, c);
+
             }
         }
         setupBoardMap();
@@ -27,6 +28,8 @@ public class Board {
     public Board(List<Checker> checkers) {
         for (Checker c : checkers) {
             checkerPosMap.put(c.position, c);
+            if (c.color != Color.Invis)
+                placedCheckers.add(c);
         }
         setupBoardMap();
     }
