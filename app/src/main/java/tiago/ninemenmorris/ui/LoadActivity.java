@@ -10,10 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tiago.ninemenmorris.DB.DBHandler;
@@ -32,15 +35,36 @@ public class LoadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
         // Fetches Game meta-data from the database and updates the recycle view
-        (new AsynkTask()).execute();
+        (new AsynkTaskFetch()).execute();
     }
 
+    @Override
+    public void onBackPressed() {
+        // Removes this activity from the activity stack
+        finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.load_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.db_flush:
+                (new AsynkTaskClear()).execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * AsynkTask that fetches a list of uncompleted game sessions and adds them to the
      * RecycleView.
      */
-    private class AsynkTask extends AsyncTask<Void, Void, List<GameMetaData>> {
+    private class AsynkTaskFetch extends AsyncTask<Void, Void, List<GameMetaData>> {
         @Override
         protected List<GameMetaData> doInBackground(Void... voids) {
             return DBHandler.getInstance().getAllGamesMetaData();
@@ -52,6 +76,44 @@ public class LoadActivity extends AppCompatActivity {
             recyclerView.hasFixedSize();
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(new GameAdapter(result, context));
+        }
+    }
+
+    /**
+     * Flushes the database and clears the screen.
+     */
+    private class AsynkTaskClear extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DBHandler.getInstance().flush();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            RecyclerView recyclerView = findViewById(R.id.loadRecycleView);
+            recyclerView.hasFixedSize();
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new GameAdapter(new ArrayList<GameMetaData>(), context));
+        }
+    }
+
+    /**
+     * Attempts to load the selected game and restart a previous game session.
+     */
+    private class AsynkTaskLoad extends AsyncTask<Integer, Void, Void> {
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            Log.w(TAG, "loading game " + integers[0] + "...");
+            DBHandler.getInstance().loadGame(integers[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            Intent intent = new Intent(context, GameActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -103,19 +165,8 @@ public class LoadActivity extends AppCompatActivity {
             public void onClick(View v) {
                 GameMetaData data = items.get(getAdapterPosition());
                 Log.d(TAG, "onClick: " + data.toString());
-
-                /* TODO: Query for the id of the selected game and set it up */
-                // Replace start with load here
-                int gameId = data.getId();
-                Game.getInstance().start();
-
-                // Start next activity
-                Intent intent = new Intent(contex, GameActivity.class);
-                startActivity(intent);
-                finish();   // prevents the stack from returning to MainActivity
-
+                (new AsynkTaskLoad()).execute(data.getId());
             }
         }
     }
-
 }

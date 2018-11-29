@@ -24,4 +24,7 @@ public interface PlayerDAO {
     @Query("DELETE FROM playerEntities WHERE gameId = :gameId")
     void deletePlayersByGameId(int gameId);
 
+    @Query("DELETE FROM playerEntities")
+    void flush();
+
 }

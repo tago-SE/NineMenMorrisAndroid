@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -19,8 +20,11 @@ public interface GameDAO {
     List<GameEntity> getAllGames();
 
     @Query("SELECT * FROM gameEntities WHERE id = :gameId")
-    List<GameEntity> getGameById(int gameId);
+    GameEntity getGameById(int gameId);
 
     @Query("DELETE FROM gameEntities WHERE id = :gameId")
     void deleteGame (int gameId);
+
+    @Query("DELETE FROM gameEntities")
+    void flush();
 }

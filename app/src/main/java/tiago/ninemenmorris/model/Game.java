@@ -82,6 +82,10 @@ public class Game {
         this.unplacedBlue = unplacedBlue;
     }
 
+    public void setCheckers(List<Checker> checkers) {
+        board = new Board(checkers);
+    }
+
     public void start() {
         if ((int) (Math.random()*100) < 50) {
             curPlayer = player1;
@@ -99,11 +103,16 @@ public class Game {
         player2.setStatePlacing();
         unplacedBlue = startingCheckers;
         unplacedRed = startingCheckers;
+        id = 0;
+        saveGameState();
+    }
+
+    private void saveGameState() {
         // Saves the started game in the database
         (new Thread() {
             @Override
             public void run(){
-                DBHandler.getInstance().insertGame(Game.getInstance());
+                DBHandler.getInstance().insertGame();
             }
         }).start();
     }
@@ -142,6 +151,7 @@ public class Game {
         if (!handleMatchingColors(position, curPlayer.color)) {
             swapCurrentPlayer();
         }
+        saveGameState();
         return board.checkers();
     }
 
@@ -156,6 +166,7 @@ public class Game {
         if (!handleMatchingColors(destination, curPlayer.color)) {
             swapCurrentPlayer();
         }
+        saveGameState();
         return board.checkers();
     }
 
@@ -175,6 +186,7 @@ public class Game {
                 c.draggable = false;
             }
         }
+        saveGameState();
         return board.checkers();
     }
 
@@ -195,6 +207,17 @@ public class Game {
     }
     public void setCurrentPlayer(Player p){
         curPlayer = p;
+        if (curPlayer.equals(player1)) {
+            player1.activeTurn = true;
+            player2.activeTurn = false;
+        } else {
+            player1.activeTurn = false;
+            player2.activeTurn = true;
+        }
+        for (Checker c : board.getPlacedCheckers()) {
+            // Conditions for making placed checkers draggable
+            c.draggable = curPlayer.color == c.color && getUnplacedCheckers(curPlayer.color) == 0;
+        }
     }
 
     private void swapCurrentPlayer() {
@@ -241,4 +264,9 @@ public class Game {
         //DBHandler.getInstance().save(this);
     }
 
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id + '}';
+    }
 }

@@ -20,6 +20,8 @@ public class Checker {
         this.draggable = draggable;
     }
 
+    public Checker() {}
+
     public Color getColor() {
         return color;
     }

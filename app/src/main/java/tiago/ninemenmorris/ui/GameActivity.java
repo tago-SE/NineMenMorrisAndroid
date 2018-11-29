@@ -151,7 +151,6 @@ public class GameActivity extends AppCompatActivity {
                 startActivity(new Intent(this, GameSettingsActivity.class));
                 return true;
             case R.id.loadgame:
-                // Load Game Activity
                 startActivity(new Intent(this, LoadActivity.class));
                 return true;
             case R.id.gamepref:
@@ -160,8 +159,6 @@ public class GameActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private void setupDrag(final CheckerView view) {
         view.setOnTouchListener(new View.OnTouchListener() {

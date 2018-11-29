@@ -23,4 +23,7 @@ public interface CheckerDAO {
 
     @Query("DELETE FROM checkerEntities WHERE gameId = :gameId")
     void deleteCheckersByGameId(int gameId);
+
+    @Query("DELETE FROM checkerEntities")
+    void flush();
 }

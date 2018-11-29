@@ -18,8 +18,9 @@ import tiago.ninemenmorris.model.Color;
 import tiago.ninemenmorris.model.Game;
 import tiago.ninemenmorris.model.GameMetaData;
 import tiago.ninemenmorris.model.Player;
+import tiago.ninemenmorris.model.Position;
 
-@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 4, exportSchema = false)
+@Database(entities = {GameEntity.class, PlayerEntity.class, CheckerEntity.class}, version = 5, exportSchema = false)
 public abstract class DBHandler extends RoomDatabase {
 
     private static final String TAG = "DBHandler";
@@ -52,6 +53,14 @@ public abstract class DBHandler extends RoomDatabase {
      */
     public static DBHandler getInstance() { return dbHandler; }
 
+    /**
+     * Flushes the database of all records.
+     */
+    public void flush() {
+        gameDAO().flush();
+        playerDAO().flush();
+        checkerDAO().flush();
+    }
 
     private void insertCheckers(List<Checker> checkers, int gameId) {
         CheckerDAO dao = checkerDAO();
@@ -66,8 +75,27 @@ public abstract class DBHandler extends RoomDatabase {
         }
     }
 
-    public void insertGame(Game game) {
+    private List<Checker> getCheckers(int id) {
+        CheckerDAO dao = checkerDAO();
+        List<Checker> checkers = new ArrayList<>();
+        for (CheckerEntity ce : dao.getcheckersByGameId(id)) {
+            Checker checker = new Checker();
+            checker.setDraggable(ce.draggable);
+            checker.setColor(Color.valueOf(ce.color));
+            checker.setPosition(Position.valueOf(ce.position));
+            checkers.add(checker);
+        }
+        return checkers;
+    }
+
+    /**
+     * Saves the current game session to the database.
+     * @return true on success
+     */
+    public boolean insertGame() {
+        Game game = Game.getInstance();
         GameEntity ge = new GameEntity();
+        ge.id = game.getId();
         ge.gameOver = game.isGameOver();
         ge.flyingCondition = game.getFlyingCondition();
         ge.loseCondition = game.getLoseCondition();
@@ -87,12 +115,49 @@ public abstract class DBHandler extends RoomDatabase {
         int id = (int) gameDAO().insertGame(ge);
         game.setId(id);
         insertCheckers(game.getCheckers(), id);
-        Log.w(TAG, "insertGame()");
+        return true;
+    }
+
+    /**
+     * Loads a previous unfinished game sessions from the database.
+     * @param id
+     * @return true if found and unfinished
+     */
+    public boolean loadGame(int id) {
+        Game game = Game.getInstance();
+        GameDAO dao = gameDAO();
+        GameEntity ge = dao.getGameById(id);
+        if (ge.gameOver)
+            return false;
+        List<Checker> checkers = getCheckers(id);
+        if (checkers.size() <= 0)
+            return false;
+        game.setId(id);
+        game.setCheckers(checkers);
+        game.setGameOver(false);
+        game.setFlyingCondition(ge.flyingCondition);
+        game.setLoseCondition(ge.loseCondition);
+        // Player red
+        game.player1.name = ge.player1;
+        game.player1.color = Color.valueOf(ge.playerColor1);
+        game.player1.setState(Player.State.valueOf(ge.playerState1));
+        game.setUnplacedRed(ge.unplaced1);
+        // Player blue
+        game.player2.name = ge.player2;
+        game.player2.color = Color.valueOf(ge.playerColor2);
+        game.player2.setState(Player.State.valueOf(ge.playerState2));
+        game.setUnplacedBlue(ge.unplaced2);
+        if (ge.playerTurn == 1) {
+            game.setCurrentPlayer(game.player1);
+        } else {
+            game.setCurrentPlayer(game.player2);
+        }
+        return true;
     }
 
     /**
      * Fetches a list containing meta-data of all game sessions that have yet finished
-     * @return List
+     * @return List containing id and other information about unfinished games.
      */
     public List<GameMetaData> getAllGamesMetaData() {
         List<GameMetaData> list = new ArrayList<>();
@@ -104,7 +169,10 @@ public abstract class DBHandler extends RoomDatabase {
         return list;
     }
 
+
+
     //method for saving into the database
+    /*
     public void save(Game game) {
 
         if(!game.isGameOver()){
@@ -137,7 +205,9 @@ public abstract class DBHandler extends RoomDatabase {
             }
         }
     }
+    */
 
+    /*
     public void load(Game game){
         List<GameEntity> theGame;
         List<PlayerEntity> thePlayers;
@@ -177,9 +247,10 @@ public abstract class DBHandler extends RoomDatabase {
         }
 
     }
-
+*/
     //delete a game
-    public void deleteGame(Game game) {
+    public void deleteGame() {
+        Game game = Game.getInstance();
         if (game.isGameOver()){
             dbHandler.gameDAO().deleteGame(game.getId());
             dbHandler.playerDAO().deletePlayersByGameId(game.getId());
